@@ -1,14 +1,14 @@
 # aru
-a text editor with ui inspired by nano
+a text editor
 
 :warning: Under Heavy Development :warning:
 
 ---
 ### Todo
-- [ ] Simple Text Editing
+- [x] Simple Text Editing
 - [ ] Opening, Closing & Saving Files
-- [ ] UTF-8 Support
-- [ ] Undo-Redo
+- [x] UTF-8 Support
+- [x] Undo-Redo
 
 ---
 ### Screenshots
