@@ -10,8 +10,11 @@
 #include "log/log.h"
 
 #include "main.h"
+#include "workspace.h"
+#include "TextEditor.h"
 
 float TitleBarHeight = 40.0f;
+float TabBarHeight = 42.0f;
 float StatusBarHeight = 40.0f;
 
 SDL_Window* window = NULL;
@@ -19,6 +22,14 @@ SDL_Renderer* renderer = NULL;
 int WindowDims[2] = { 700, 500 };
 
 bool AppCloseRequested = false;
+
+#define MAX_TABS 150
+int CurrentTabIndex = 0;
+Workspace* TabsArr[MAX_TABS] = { NULL };
+#define Ws TabsArr[CurrentTabIndex]
+
+ImFont* UI_Font = NULL;
+ImFont* ED_Font = NULL;
 
 int main(int argc, char** argv) {
 	atexit(_FreeEverything);
@@ -88,11 +99,16 @@ int main(int argc, char** argv) {
 	ImGuiIO& io = ImGui::GetIO(); (void)io;
 	// ImGuiStyle& style = ImGui::GetStyle();
 	io.IniFilename = NULL;
+	ED_Font = io.Fonts->AddFontFromFileTTF("/home/adityam/.local/share/fonts/Saja Typeworks/TrueType/Cascadia Code PL/Cascadia_Code_PL_Regular.ttf", 18);
+	UI_Font = io.Fonts->AddFontFromFileTTF("/home/adityam/.local/share/fonts/Saja Typeworks/TrueType/Cascadia Code PL/Cascadia_Code_PL_Regular.ttf", 16);
 
 	ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
 	ImGui_ImplSDLRenderer_Init(renderer);
 
 	ImVec4 EditorBG = ImVec4(0.12f, 0.12f, 0.12f, 1.00f);
+
+	Ws = new Workspace("main.cpp");
+	Ws->Editor->SetLanguageDefinition(TextEditor::LanguageDefinition::CPlusPlus());
 
 	SDL_ShowWindow(window);
 
@@ -117,6 +133,8 @@ int main(int argc, char** argv) {
 }
 
 static inline void _BuildGui(void) {
+	ImGui::PushFont(UI_Font);
+
 	ImGui::Begin("aru title bar###TitleBar", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 	ImGui::SetWindowPos({ 0.0f, 0.0f });
 	ImGui::SetWindowSize({ (float)WindowDims[0], TitleBarHeight });
@@ -125,21 +143,53 @@ static inline void _BuildGui(void) {
 
 	ImGui::End();
 
-	ImGui::Begin("aru workspace###Workspace", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+	ImGui::Begin("aru tab bar###TabBar", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 	ImGui::SetWindowPos({ 0.0f, TitleBarHeight });
-	ImGui::SetWindowSize({ (float)WindowDims[0], WindowDims[1] - StatusBarHeight - TitleBarHeight });
+	ImGui::SetWindowSize({ (float)WindowDims[0], TabBarHeight });
 
-	ImGui::Text("this is main workspace!");
+	for (int i = 0; i < MAX_TABS; ++i) {
+		if (TabsArr[i] != NULL) {
+			if (ImGui::Button((Ws->FileName + "###" + std::to_string(i)).c_str())) {
+				CurrentTabIndex = i;
+			}
+			ImGui::SameLine();
+		}
+	}
+
+	ImGui::Text("this is tab bar text!");
 
 	ImGui::End();
+
+	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0.0f, 0.0f });
+	ImGui::Begin("aru workspace###Workspace", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+	ImGui::SetWindowPos({ 0.0f, TitleBarHeight + TabBarHeight });
+	ImGui::SetWindowSize({ (float)WindowDims[0], WindowDims[1] - StatusBarHeight - TitleBarHeight - TabBarHeight });
+
+	auto cpos = Ws->Editor->GetCursorPosition();
+
+	ImGui::PopFont();
+	ImGui::PushFont(ED_Font);
+	Ws->Editor->Render("TextEditor");
+	ImGui::PopFont();
+	ImGui::PushFont(UI_Font);
+
+	ImGui::End();
+	ImGui::PopStyleVar();
 
 	ImGui::Begin("aru status bar###StatusBar", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
 	ImGui::SetWindowPos({ 0.0f, (float)WindowDims[1] - StatusBarHeight });
 	ImGui::SetWindowSize({ (float)WindowDims[0], StatusBarHeight });
 
-	ImGui::Text("this is status bar text!");
+	ImGui::Text(
+		"%6d/%-6d %6d lines  | %s | %s | %s",
+		cpos.mLine + 1, cpos.mColumn + 1, Ws->Editor->GetTotalLines(),
+		Ws->Editor->IsOverwrite() ? "Ovr" : "Ins",
+		Ws->Editor->CanUndo() ? "*" : " ",
+		Ws->Editor->GetLanguageDefinition().mName.c_str()
+	);
 
 	ImGui::End();
+	ImGui::PopFont();
 }
 
 static inline void _ProcessEvents(void) {
@@ -240,6 +290,13 @@ int WriteScreenDataToImg(SDL_Renderer* ren, const char* path) {
 
 void _FreeEverything(void) {
 	// WriteScreenDataToImg(renderer, "screenshot-before-close.png");
+
+	for (int i = 0; i < MAX_TABS; ++i) {
+		if (TabsArr[i] != NULL) {
+			delete TabsArr[i];
+			TabsArr[i] = NULL;
+		}
+	}
 
 	ImGui_ImplSDLRenderer_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
