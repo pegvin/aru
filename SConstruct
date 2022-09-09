@@ -39,12 +39,14 @@ if not env.GetOption('clean'):
 			"ARU_VMAJOR={0}".format(MajVer),
 			"ARU_VMINOR={0}".format(MinVer),
 			"ARU_VPATCH={0}".format(PatVer),
+			"ARU_VERSION={0}.{1}.{2}".format(MajVer, MinVer, PatVer),
 			"ARU_BUILD_STABLE={0}".format(int(Stable))
 		],
 		CPPDEFINES=[
 			"ARU_VMAJOR={0}".format(MajVer),
 			"ARU_VMINOR={0}".format(MinVer),
 			"ARU_VPATCH={0}".format(PatVer),
+			'ARU_VERSION=\\"{0}.{1}.{2}\\"'.format(MajVer, MinVer, PatVer),
 			"ARU_BUILD_STABLE={0}".format(int(Stable))
 		],
 	)
@@ -78,7 +80,7 @@ if env['mode'] == 'release':
 
 if env['mode'] == 'debug':
 	env.Append(
-		CCFLAGS=['-O0', '-g', '-Wno-unused-function']
+		CCFLAGS=['-O0', '-g', '-Wno-unused-function', '-pedantic']
 	)
 
 def GatherFiles(Directories):
@@ -95,41 +97,20 @@ def GatherFiles(Directories):
 	return files
 
 # Get all the c and c++ files in src, recursively.
-sources = GatherFiles(['src', 'lib/imgui-1.88', 'lib/log'])
+sources = GatherFiles(['src'])
 
 # Header Directories.
 env.Append(
-	CPATH=['src/', 'lib/'],
-	CPPPATH=['src/', 'lib/imgui-1.88/', 'lib/']
+	CPATH=['src/'],
+	CPPPATH=['src/']
 )
 
 # Windows compilation support.
-if target_os == 'msys':
+if target_os != 'msys':
 	env.Append(
-		LIBS=[
-			'SDL2main',
-			'SDL2', 'mingw32', 'opengl32', 'comdlg32', 'imagehlp', 'dinput8',
-			'dxguid', 'dxerr8', 'user32', 'gdi32', 'winmm', 'imm32', 'ole32', 'oleaut32',
-			'shell32', 'version', 'uuid', 'setupapi'
-		],
-		LINKFLAGS=[
-			"-mwindows", # Fix Console From Popping-Up
-			"--static"   # Link GLFW & Stuff Statically
-		]
-	)
-else:
-	env.Append(
-		LIBS=['SDL2', 'dl', 'm'],
 		CXXFLAGS=['-Wall', '-Wno-narrowing'],
-		CFLAGS=['-Wall', '-Wno-unknown-pragma'],
-		CDEFINES=['LOG_USE_COLOR'],
-		CPPDEFINES=['LOG_USE_COLOR'],
+		CFLAGS=['-Wall', '-Wno-unknown-pragma']
 	)
-
-# # OSX Compilation support.
-if target_os == 'darwin':
-	env.Append(FRAMEWORKS=['OpenGL', 'Cocoa'])
-	env.Append(LIBS=['m', 'sdl2', 'objc'])
 
 # Append external environment flags
 env.Append(
