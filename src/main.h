@@ -3,8 +3,10 @@
 
 #include <string>
 
-void FreeEverything(void);
-static inline void ProcessEvents(void);
+void _FreeEverything(void);
+static inline void _ProcessEvents(void);
+static inline void _BuildGui(void);
+static inline int _EventWatcher(void* data, SDL_Event* event);
 
 #ifndef ARU_VERSION_MAJOR
 	#define ARU_VERSION_MAJOR 0
