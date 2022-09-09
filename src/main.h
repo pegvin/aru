@@ -1,6 +1,11 @@
 #ifndef MAIN_H
 #define MAIN_H
 
+#include <string>
+
+void FreeEverything(void);
+static inline void ProcessEvents(void);
+
 #ifndef ARU_VERSION_MAJOR
 	#define ARU_VERSION_MAJOR 0
 #endif
@@ -28,5 +33,9 @@
 						"." + std::to_string(ARU_VERSION_PATCH) + \
 						"-" + ARU_BUILD_TYPE
 
+
+#define WINDOW_TITLE_CSTR (               \
+		std::string("aru ") + VERSION_STR \
+	).c_str()
 
 #endif // MAIN_H
