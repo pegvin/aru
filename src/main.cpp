@@ -239,7 +239,7 @@ int WriteScreenDataToImg(SDL_Renderer* ren, const char* path) {
 }
 
 void _FreeEverything(void) {
-	WriteScreenDataToImg(renderer, "screenshot-before-close.png");
+	// WriteScreenDataToImg(renderer, "screenshot-before-close.png");
 
 	ImGui_ImplSDLRenderer_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
