@@ -156,8 +156,6 @@ static inline void _BuildGui(void) {
 		}
 	}
 
-	ImGui::Text("this is tab bar text!");
-
 	ImGui::End();
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, { 0.0f, 0.0f });
