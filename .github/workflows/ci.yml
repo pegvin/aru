@@ -16,6 +16,9 @@ jobs:
       run: |
         sudo apt-get install git scons
 
+    - name: Build And Install SDL2
+      run: bash ./scripts/buildNinstall.sh
+
     - name: Build
       run: make release
 
