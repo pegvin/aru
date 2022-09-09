@@ -8,6 +8,9 @@
 
 #include "main.h"
 
+float TitleBarHeight = 40.0f;
+float StatusBarHeight = 40.0f;
+
 SDL_Window* window = NULL;
 SDL_Renderer* renderer = NULL;
 int WindowDims[2] = { 700, 500 };
@@ -109,9 +112,6 @@ int main(int argc, char** argv) {
 
 	return 0;
 }
-
-#define TitleBarHeight 40.0f
-#define StatusBarHeight 40.0f
 
 static inline void _BuildGui(void) {
 	ImGui::Begin("aru title bar###TitleBar", NULL, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
