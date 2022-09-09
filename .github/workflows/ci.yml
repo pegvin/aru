@@ -1,0 +1,30 @@
+name: ci
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+
+jobs:
+  linux-x86_64:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Install Git & Scons
+      run: |
+        sudo apt-get install git scons
+
+    - name: Build
+      run: make release
+
+    - name: Strip
+      run: strip ./aru
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: linux-x86_64
+        path: ./aru
+        if-no-files-found: error
