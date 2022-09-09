@@ -8,6 +8,8 @@ static inline void _ProcessEvents(void);
 static inline void _BuildGui(void);
 static inline int _EventWatcher(void* data, SDL_Event* event);
 
+int WriteScreenDataToImg(SDL_Renderer* ren, const char* path);
+
 #ifndef ARU_VERSION_MAJOR
 	#define ARU_VERSION_MAJOR 0
 #endif

@@ -195,8 +195,23 @@ static inline int _EventWatcher(void* data, SDL_Event* event) {
 	return 0;
 }
 
+int WriteScreenDataToImg(SDL_Renderer* ren, const char* path) {
+	int h = 0, w = 0;
+	if (SDL_GetRendererOutputSize(ren, &w, &h) != 0) {
+		log_error("cannot get renderer output size: %s", SDL_GetError());
+		return -1;
+	}
+
+	SDL_Surface* sshot = SDL_CreateRGBSurface(0, w, h, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
+	SDL_RenderReadPixels(ren, NULL, SDL_PIXELFORMAT_ARGB8888, sshot->pixels, sshot->pitch);
+	SDL_SaveBMP(sshot, path);
+	SDL_FreeSurface(sshot);
+	return 0;
+}
 
 void _FreeEverything(void) {
+	WriteScreenDataToImg(renderer, "screenshot-before-close.bmp");
+
 	ImGui_ImplSDLRenderer_Shutdown();
 	ImGui_ImplSDL2_Shutdown();
 	ImGui::DestroyContext();
