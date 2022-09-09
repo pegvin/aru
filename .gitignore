@@ -50,3 +50,13 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+.sconsign.dblite
+.sconf_temp
+imgui.ini
+config.log
+.DS_Store
+xcuserdata/
+todo
+.vimrc
+.SRCINFO
