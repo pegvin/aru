@@ -13,7 +13,7 @@ a text editor
 ---
 ### Screenshots
 
-![image](https://user-images.githubusercontent.com/75035219/189336808-50cdbdd3-fd94-4eb5-93e4-1b268b651185.png)
+![image](https://user-images.githubusercontent.com/75035219/189371588-d2734cf2-6154-4a03-a4c6-40f569f8f9e6.png)
 
 ---
 ## Thanks
