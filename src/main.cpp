@@ -1,5 +1,8 @@
 #include <string>
 
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb/stb_image_write.h"
+
 #include "imgui-1.88/imgui.h"
 #include "imgui-1.88/imgui_impl_sdl.h"
 #include "imgui-1.88/imgui_impl_sdlrenderer.h"
@@ -195,6 +198,13 @@ static inline int _EventWatcher(void* data, SDL_Event* event) {
 	return 0;
 }
 
+static inline Uint32* _GetPixel(int x, int y, int h, int w, Uint32* data) {
+	if (x >= 0 && x < w && y >= 0 && y < h && data != NULL) {
+		return &data[(y * w + x)];
+	}
+	return NULL;
+}
+
 int WriteScreenDataToImg(SDL_Renderer* ren, const char* path) {
 	int h = 0, w = 0;
 	if (SDL_GetRendererOutputSize(ren, &w, &h) != 0) {
@@ -202,15 +212,34 @@ int WriteScreenDataToImg(SDL_Renderer* ren, const char* path) {
 		return -1;
 	}
 
-	SDL_Surface* sshot = SDL_CreateRGBSurface(0, w, h, 32, 0x00ff0000, 0x0000ff00, 0x000000ff, 0xff000000);
-	SDL_RenderReadPixels(ren, NULL, SDL_PIXELFORMAT_ARGB8888, sshot->pixels, sshot->pitch);
-	SDL_SaveBMP(sshot, path);
-	SDL_FreeSurface(sshot);
+	Uint8* pixels = (Uint8*)malloc(w * h * 4);
+	memset(pixels, 0, w * h * 4 * sizeof(Uint8));
+
+	SDL_Surface* ScreenSurface = SDL_CreateRGBSurface(0, w, h, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff);
+	SDL_RenderReadPixels(ren, NULL, SDL_PIXELFORMAT_RGBA8888, ScreenSurface->pixels, ScreenSurface->pitch);
+
+	SDL_LockSurface(ScreenSurface);
+
+	for (int y = 0; y < h; ++y) {
+		for (int x = 0; x < w; ++x) {
+			Uint32* pixel = _GetPixel(x, y, h, w, (Uint32*)ScreenSurface->pixels);
+			Uint8* ptr = pixels + ((y * w + x) * 4);
+			*(ptr+0) = (*pixel >> 24) & 0xff; // R
+			*(ptr+1) = (*pixel >> 16) & 0xff; // G
+			*(ptr+2) = (*pixel >> 8 ) & 0xff; // B
+			*(ptr+3) = (*pixel      ) & 0xff; // A
+		}
+	}
+
+	SDL_UnlockSurface(ScreenSurface);
+	stbi_write_png(path, w, h, 4, pixels, 0);
+	free(pixels);
+	SDL_FreeSurface(ScreenSurface);
 	return 0;
 }
 
 void _FreeEverything(void) {
-	WriteScreenDataToImg(renderer, "screenshot-before-close.bmp");
+	WriteScreenDataToImg(renderer, "screenshot-before-close.png");
 
 	ImGui_ImplSDLRenderer_Shutdown();
 	ImGui_ImplSDL2_Shutdown();

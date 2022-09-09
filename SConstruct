@@ -36,16 +36,15 @@ if not env.GetOption('clean'):
 
 	env.Append(
 		CDEFINES=[
-			"ARU_VERSION_MAJOR={0}".format(MajVer),
-			"ARU_VERSION_MINOR={0}".format(MinVer),
-			"ARU_VERSION_PATCH={0}".format(PatVer),
+			"ARU_VMAJOR={0}".format(MajVer),
+			"ARU_VMINOR={0}".format(MinVer),
+			"ARU_VPATCH={0}".format(PatVer),
 			"ARU_BUILD_STABLE={0}".format(int(Stable))
 		],
 		CPPDEFINES=[
-			"ENABLE_WIN_ICON",
-			"ARU_VERSION_MAJOR={0}".format(MajVer),
-			"ARU_VERSION_MINOR={0}".format(MinVer),
-			"ARU_VERSION_PATCH={0}".format(PatVer),
+			"ARU_VMAJOR={0}".format(MajVer),
+			"ARU_VMINOR={0}".format(MinVer),
+			"ARU_VPATCH={0}".format(PatVer),
 			"ARU_BUILD_STABLE={0}".format(int(Stable))
 		],
 	)
@@ -79,7 +78,7 @@ if env['mode'] == 'release':
 
 if env['mode'] == 'debug':
 	env.Append(
-		CCFLAGS=['-O0', '-g', '-Werror', '-Wno-unused-function']
+		CCFLAGS=['-O0', '-g', '-Wno-unused-function']
 	)
 
 def GatherFiles(Directories):
@@ -97,7 +96,6 @@ def GatherFiles(Directories):
 
 # Get all the c and c++ files in src, recursively.
 sources = GatherFiles(['src', 'lib/imgui-1.88', 'lib/log'])
-# sources += glob.glob('lib/tinyfiledialogs.c')
 
 # Header Directories.
 env.Append(
@@ -124,7 +122,8 @@ else:
 		LIBS=['SDL2', 'dl', 'm'],
 		CXXFLAGS=['-Wall', '-Wno-narrowing'],
 		CFLAGS=['-Wall', '-Wno-unknown-pragma'],
-		CDEFINES=['LOG_USE_COLOR']
+		CDEFINES=['LOG_USE_COLOR'],
+		CPPDEFINES=['LOG_USE_COLOR'],
 	)
 
 # # OSX Compilation support.

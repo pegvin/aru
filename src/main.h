@@ -10,16 +10,16 @@ static inline int _EventWatcher(void* data, SDL_Event* event);
 
 int WriteScreenDataToImg(SDL_Renderer* ren, const char* path);
 
-#ifndef ARU_VERSION_MAJOR
-	#define ARU_VERSION_MAJOR 0
+#ifndef ARU_VMAJOR
+	#define ARU_VMAJOR 0
 #endif
 
-#ifndef ARU_VERSION_MINOR
-	#define ARU_VERSION_MINOR 0
+#ifndef ARU_VMINOR
+	#define ARU_VMINOR 0
 #endif
 
-#ifndef ARU_VERSION_PATCH
-	#define ARU_VERSION_PATCH 0
+#ifndef ARU_VPATCH
+	#define ARU_VPATCH 0
 #endif
 
 #ifndef ARU_BUILD_STABLE
@@ -32,9 +32,9 @@ int WriteScreenDataToImg(SDL_Renderer* ren, const char* path);
 	#define ARU_BUILD_TYPE "stable"
 #endif
 
-#define VERSION_STR "v" + std::to_string(ARU_VERSION_MAJOR) + \
-						"." + std::to_string(ARU_VERSION_MINOR) + \
-						"." + std::to_string(ARU_VERSION_PATCH) + \
+#define VERSION_STR "v" + std::to_string(ARU_VMAJOR) + \
+						"." + std::to_string(ARU_VMINOR) + \
+						"." + std::to_string(ARU_VPATCH) + \
 						"-" + ARU_BUILD_TYPE
 
 
