@@ -14,7 +14,7 @@ jobs:
 
     - name: Install Git, Scons & json-c
       run: |
-        sudo apt-get install git scons libjson-c-dev libjson-c5
+        sudo apt-get install git scons libjson-c-dev libjson-c
 
     - name: Build
       run: make gen-assets release
