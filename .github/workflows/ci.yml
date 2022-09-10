@@ -28,3 +28,27 @@ jobs:
         name: linux-x86_64
         path: ./aru
         if-no-files-found: error
+
+  osx-x86_64:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Install scons
+      run: |
+        brew install scons
+
+    - name: Build
+      run: make gen-assets release
+
+    - name: Strip
+      run: strip ./aru
+
+    - name: Upload Artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: osx-x86_64
+        path: ./aru
+        if-no-files-found: error
