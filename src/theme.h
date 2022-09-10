@@ -12,7 +12,7 @@ typedef struct {
 	int DEFAULT;
 } theme_t;
 
-theme_t* ThemeLoadFrom(const char* iniText);
+theme_t* ThemeLoadFrom(const char* jsonText);
 void FreeTheme(theme_t* t);
 
 #endif

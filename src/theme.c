@@ -5,7 +5,6 @@
 #include <ctype.h>
 
 #include "theme.h"
-#include "ini/ini.h"
 #include "colors.h"
 
 #if IS_DEBUG
@@ -116,12 +115,12 @@ void _set_color(char* name, char* value, theme_t* t) {
 	}
 }
 
-theme_t* ThemeLoadFrom(const char* iniText) {
+theme_t* ThemeLoadFrom(const char* jsonText) {
 	struct json_object* ParsedJSON;
 	struct json_object* name;
 	struct json_object* _colors;
 
-	ParsedJSON = json_tokener_parse(iniText);
+	ParsedJSON = json_tokener_parse(jsonText);
 	json_object_object_get_ex(ParsedJSON, "name", &name);
 	json_object_object_get_ex(ParsedJSON, "colors", &_colors);
 
@@ -131,7 +130,7 @@ theme_t* ThemeLoadFrom(const char* iniText) {
 
 	{
 		int _col = -1;
-		if (iniText == NULL) _col = FG_WHITE;
+		if (jsonText == NULL) _col = FG_WHITE;
 
 		t->DEFAULT = _col;
 		t->COMMENT = _col;
@@ -143,7 +142,7 @@ theme_t* ThemeLoadFrom(const char* iniText) {
 		t->MATCH = _col;
 	}
 
-	if (iniText == NULL)
+	if (jsonText == NULL)
 		return t;
 
 	enum json_type type;
