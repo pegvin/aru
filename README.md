@@ -15,7 +15,7 @@ a improved version of text editor i made by following [Build Your Own Text Edito
 ---
 ### Screenshots
 
-
+![image](https://user-images.githubusercontent.com/75035219/189479152-8252e6ac-704f-4f53-bde3-4e2b3944fe9a.png)
 
 ---
 ## Thanks
