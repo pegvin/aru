@@ -25,7 +25,7 @@ jobs:
         cd build
         cmake -DBUILD_SHARED_LIBS=On -DCMAKE_BUILD_TYPE=Release ..
         make
-        make install
+        sudo make install
 
     - name: Build
       run: make gen-assets release
@@ -60,7 +60,7 @@ jobs:
         cd build
         cmake -DBUILD_SHARED_LIBS=On -DCMAKE_BUILD_TYPE=Release ..
         make
-        make install
+        sudo make install
 
     - name: Build
       run: make gen-assets release
