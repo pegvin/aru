@@ -12,9 +12,19 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Install Git, Scons & json-c
+    - name: Install Git, Scons & cmake
       run: |
-        sudo apt-get install git scons libjson-c
+        sudo apt-get install git scons cmake
+
+    - name: Build & Install json-c
+      run: | # XX - Build Static Library & Use That Instead
+        cd ..
+        git clone https://github.com/json-c/json-c -b json-c-0.16-20220414 json-c
+        mkdir build
+        cd build
+        cmake .. -DBUILD_SHARED_LIBS=On -DCMAKE_BUILD_TYPE=Release
+        make
+        make install
 
     - name: Build
       run: make gen-assets release
@@ -36,9 +46,19 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Install scons & json-c
+    - name: Install scons & cmake
       run: |
-        brew install scons json-c
+        brew install scons cmake
+
+    - name: Build & Install json-c
+      run: | # XX - Build Static Library & Use That Instead
+        cd ..
+        git clone https://github.com/json-c/json-c -b json-c-0.16-20220414 json-c
+        mkdir build
+        cd build
+        cmake .. -DBUILD_SHARED_LIBS=On -DCMAKE_BUILD_TYPE=Release
+        make
+        make install
 
     - name: Build
       run: make gen-assets release
