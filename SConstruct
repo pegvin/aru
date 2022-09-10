@@ -80,7 +80,7 @@ if env['mode'] == 'release':
 
 if env['mode'] == 'debug':
 	env.Append(
-		CCFLAGS=['-O0', '-g', '-Wno-unused-function', '-pedantic']
+		CCFLAGS=['-O0', '-g', '-Wno-unused-function', '-pedantic', '-DIS_DEBUG']
 	)
 
 def GatherFiles(Directories):
@@ -97,12 +97,12 @@ def GatherFiles(Directories):
 	return files
 
 # Get all the c and c++ files in src, recursively.
-sources = GatherFiles(['src/', 'lib/ini/'])
+sources = GatherFiles(['src/'])
 
 # Header Directories.
 env.Append(
-	CPATH=['src/', 'lib/'],
-	CPPPATH=['src/', 'lib/']
+	CPATH=['src/'],
+	CPPPATH=['src/']
 )
 
 # Windows compilation support.
@@ -111,6 +111,8 @@ if target_os != 'msys':
 		CXXFLAGS=['-Wall', '-Wno-narrowing'],
 		CFLAGS=['-Wall', '-Wno-unknown-pragma']
 	)
+
+env.Append(LIBS=['json-c'])
 
 # Append external environment flags
 env.Append(

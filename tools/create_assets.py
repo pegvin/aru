@@ -20,7 +20,8 @@ if CWD != PROJECT_ROOT:
 	sys.exit(-1)
 
 TYPES = {
-	"ini":   { "text": True,  "Disabled": False }
+	"ini":    { "text": True,  "Disabled": False },
+	"json":   { "text": True,  "Disabled": False }
 }
 
 # Parse Disabled Stuff, --disabled=csv,glsl
