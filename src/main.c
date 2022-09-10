@@ -44,6 +44,12 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "theme.h"
+#include "colors.h"
+#include "assets.h"
+
+theme_t* EdTheme = NULL;
+
 /*** defines ***/
 
 #if ARU_BUILD_STABLE == 0
@@ -393,14 +399,14 @@ void editorUpdateSyntax(erow *row) {
 
 int editorSyntaxToColor(int hl) {
 	switch (hl) {
-		case HL_COMMENT:
-		case HL_MLCOMMENT: return 36;
-		case HL_KEYWORD1: return 33;
-		case HL_KEYWORD2: return 32;
-		case HL_STRING: return 35;
-		case HL_NUMBER: return 31;
-		case HL_MATCH: return 34;
-		default: return 37;
+		case HL_COMMENT:   return EdTheme->COMMENT;
+		case HL_MLCOMMENT: return EdTheme->MLCOMMENT;
+		case HL_KEYWORD1:  return EdTheme->KEYWORD1;
+		case HL_KEYWORD2:  return EdTheme->KEYWORD2;
+		case HL_STRING:    return EdTheme->STRING;
+		case HL_NUMBER:    return EdTheme->NUMBER;
+		case HL_MATCH:     return EdTheme->MATCH;
+		default:           return EdTheme->DEFAULT;
 	}
 }
 
@@ -1086,6 +1092,7 @@ void initEditor() {
 }
 
 int main(int argc, char *argv[]) {
+	EdTheme = ThemeLoadFrom(AssetsGet("data/themes/dark.ini", NULL));
 	enableRawMode();
 	initEditor();
 	if (argc >= 2) {
@@ -1100,5 +1107,7 @@ int main(int argc, char *argv[]) {
 		editorProcessKeypress();
 	}
 
+	FreeTheme(EdTheme);
+	EdTheme = NULL;
 	return 0;
 }

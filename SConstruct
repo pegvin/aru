@@ -97,12 +97,12 @@ def GatherFiles(Directories):
 	return files
 
 # Get all the c and c++ files in src, recursively.
-sources = GatherFiles(['src'])
+sources = GatherFiles(['src/', 'lib/ini/'])
 
 # Header Directories.
 env.Append(
-	CPATH=['src/'],
-	CPPPATH=['src/']
+	CPATH=['src/', 'lib/'],
+	CPPPATH=['src/', 'lib/']
 )
 
 # Windows compilation support.
