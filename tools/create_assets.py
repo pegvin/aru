@@ -36,7 +36,7 @@ for argument in sys.argv:
 		break;
 
 GROUPS = [
-	'themes'
+	'themes', 'languages'
 ]
 
 TEMPLATE = '{{\n\t.path = "{path}",\n\t.size = {size},\n\t.data = {data}\n}},\n\n'

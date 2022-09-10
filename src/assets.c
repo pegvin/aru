@@ -7,8 +7,8 @@ typedef struct {
 	const void      *data __attribute__((aligned(4)));
 } asset_t;
 
-static asset_t ASSETS[1] = {
-	// #include "assets/languages.inl"
+static asset_t ASSETS[] = {
+	#include "assets/languages.inl"
 	#include "assets/themes.inl"
 };
 

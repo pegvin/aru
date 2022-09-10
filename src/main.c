@@ -48,45 +48,35 @@
 #include "theme.h"
 #include "colors.h"
 #include "assets.h"
+#include "language.h"
 
 theme_t* EdTheme = NULL;
-
-/*** data ***/
-
-struct editorSyntax {
-	char *filetype;
-	char **filematch;
-	char **keywords;
-	char *singleline_comment_start;
-	char *multiline_comment_start;
-	char *multiline_comment_end;
-	int flags;
-};
-
 struct editorConfig E;
 
 /*** filetypes ***/
 
-char *C_HL_extensions[] = { ".c", ".h", ".cpp", NULL };
-char *C_HL_keywords[] = {
-	"switch", "if", "while", "for", "break", "continue", "return", "else",
-	"struct", "union", "typedef", "static", "enum", "class", "case",
+// char *C_HL_extensions[] = { ".c", ".h", ".cpp", NULL };
+// char *C_HL_keywords[] = {
+// 	"switch", "if", "while", "for", "break", "continue", "return", "else",
+// 	"struct", "union", "typedef", "static", "enum", "class", "case",
 
-	"int|", "long|", "double|", "float|", "char|", "unsigned|", "signed|",
-	"void|", NULL
-};
+// 	"int|", "long|", "double|", "float|", "char|", "unsigned|", "signed|",
+// 	"void|", NULL
+// };
 
-struct editorSyntax HLDB[] = {
-	{
-		"c",
-		C_HL_extensions,
-		C_HL_keywords,
-		"//", "/*", "*/",
-		HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
-	},
-};
+language_arr_t* L_Arr = NULL;
 
-#define HLDB_ENTRIES (sizeof(HLDB) / sizeof(HLDB[0]))
+// struct editorSyntax HLDB[] = {
+// 	{
+// 		"c",
+// 		C_HL_extensions,
+// 		C_HL_keywords,
+// 		"//", "/*", "*/",
+// 		HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
+// 	},
+// };
+
+// int HLDB_ENTRIES = 1;
 
 /*** terminal ***/
 
@@ -212,11 +202,11 @@ void editorUpdateSyntax(erow *row) {
 
 	if (E.syntax == NULL) return;
 
-	char **keywords = E.syntax->keywords;
+	char** keywords = E.syntax->keywords;
 
-	char *scs = E.syntax->singleline_comment_start;
-	char *mcs = E.syntax->multiline_comment_start;
-	char *mce = E.syntax->multiline_comment_end;
+	char* scs = E.syntax->singleline_comment_start;
+	char* mcs = E.syntax->multiline_comment_start;
+	char* mce = E.syntax->multiline_comment_end;
 
 	int scs_len = scs ? strlen(scs) : 0;
 	int mcs_len = mcs ? strlen(mcs) : 0;
@@ -293,21 +283,22 @@ void editorUpdateSyntax(erow *row) {
 
 		if (prev_sep) {
 			int j;
-			for (j = 0; keywords[j]; j++) {
+			for (j = 0; j < E.syntax->totalKeywords; j++) {
 				int klen = strlen(keywords[j]);
 				int kw2 = keywords[j][klen - 1] == '|';
 				if (kw2) klen--;
 
-				if (!strncmp(&row->render[i], keywords[j], klen) &&
-						is_separator(row->render[i + klen])) {
+				if (!strncmp(&row->render[i], keywords[j], klen) && is_separator(row->render[i + klen])) {
 					memset(&row->hl[i], kw2 ? HL_KEYWORD2 : HL_KEYWORD1, klen);
 					i += klen;
 					break;
 				}
 			}
-			if (keywords[j] != NULL) {
-				prev_sep = 0;
-				continue;
+			if (j > 0 && j < E.syntax->totalKeywords) {
+				if (keywords[j] != NULL) {
+					prev_sep = 0;
+					continue;
+				}
 			}
 		}
 
@@ -338,15 +329,14 @@ void editorSelectSyntaxHighlight() {
 	E.syntax = NULL;
 	if (E.filename == NULL) return;
 
-	char *ext = strrchr(E.filename, '.');
+	char* ext = strrchr(E.filename, '.');
 
-	for (unsigned int j = 0; j < HLDB_ENTRIES; j++) {
-		struct editorSyntax *s = &HLDB[j];
-		unsigned int i = 0;
-		while (s->filematch[i]) {
+	for (unsigned int j = 0; j < L_Arr->numOfLangs; j++) {
+		language_t* s = L_Arr->languages[j];
+		for (int i = 0; i < s->totalMatches; ++i) {
+			printf("%s\n", s->filematch[i]);
 			int is_ext = (s->filematch[i][0] == '.');
-			if ((is_ext && ext && !strcmp(ext, s->filematch[i])) ||
-					(!is_ext && strstr(E.filename, s->filematch[i]))) {
+			if ((is_ext && ext && !strcmp(ext, s->filematch[i])) || (!is_ext && strstr(E.filename, s->filematch[i]))) {
 				E.syntax = s;
 
 				int filerow;
@@ -356,7 +346,6 @@ void editorSelectSyntaxHighlight() {
 
 				return;
 			}
-			i++;
 		}
 	}
 }
@@ -1016,6 +1005,7 @@ void initEditor() {
 }
 
 int main(int argc, char *argv[]) {
+	L_Arr = LoadAllLanguages();
 	EdTheme = ThemeLoadFrom(AssetsGet("data/themes/dark.json", NULL));
 	enableRawMode();
 	initEditor();
@@ -1032,6 +1022,8 @@ int main(int argc, char *argv[]) {
 	}
 
 	FreeTheme(EdTheme);
+	FreeLanguageArr(L_Arr);
 	EdTheme = NULL;
+	L_Arr = NULL;
 	return 0;
 }
