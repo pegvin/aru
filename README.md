@@ -5,12 +5,15 @@ a text editor
 
 ---
 ### Implement
-- [ ] Simple Text Editing
-- [ ] Syntax Highlighting
-- [ ] Opening, Closing & Saving Files
+- [x] Simple Text Editing
+- [x] Syntax Highlighting
+- [x] Opening, Closing & Saving Files
 - [ ] Windows Support
 - [ ] Undo-Redo
-- [ ] Custom Configuration
+- [x] Custom Themes and Syntaxes
+- [ ] Opening a file in editor itself
+- [ ] Loading Themes and syntaxes from disk
+- [ ] Regex support for syntaxes
 
 ---
 ### Screenshots
