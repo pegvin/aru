@@ -1,19 +1,21 @@
 # aru
-a text editor
+a improved version of text editor i made by following [Build Your Own Text Editor](https://viewsourcecode.org/snaptoken/kilo/)
 
 :warning: Under Heavy Development :warning:
 
 ---
-### Todo
-- [x] Simple Text Editing
+### Implement
+- [ ] Simple Text Editing
+- [ ] Syntax Highlighting
 - [ ] Opening, Closing & Saving Files
-- [x] UTF-8 Support
-- [x] Undo-Redo
+- [ ] Windows Support
+- [ ] Undo-Redo
+- [ ] Custom Configuration
 
 ---
 ### Screenshots
 
-![image](https://user-images.githubusercontent.com/75035219/189371588-d2734cf2-6154-4a03-a4c6-40f569f8f9e6.png)
+
 
 ---
 ## Thanks
