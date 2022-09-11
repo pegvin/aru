@@ -22,7 +22,7 @@
 #define CTRL_KEY(k) ((k) & 0x1f)
 
 // Structs & Enums
-enum editorKey {
+typedef enum {
 	BACKSPACE = 127,
 	ARROW_LEFT = 1000,
 	ARROW_RIGHT,
@@ -33,9 +33,9 @@ enum editorKey {
 	END_KEY,
 	PAGE_UP,
 	PAGE_DOWN
-};
+} editor_key_t;
 
-typedef enum editorHighlight {
+typedef enum {
 	HL_NORMAL = 0,
 	HL_COMMENT,
 	HL_MLCOMMENT,
@@ -46,7 +46,7 @@ typedef enum editorHighlight {
 	HL_MATCH
 } syntax_color_t;
 
-typedef struct erow {
+typedef struct {
 	int idx;
 	int size;
 	int rsize;
@@ -56,7 +56,7 @@ typedef struct erow {
 	int hl_open_comment;
 } erow;
 
-struct editorConfig {
+typedef struct {
 	int cx, cy;
 	int rx;
 	int rowoff;
@@ -71,7 +71,7 @@ struct editorConfig {
 	time_t statusmsg_time;
 	struct editorSyntax *syntax;
 	struct termios orig_termios;
-};
+} editor_t;
 
 void editorSetStatusMessage(const char *fmt, ...);
 void editorRefreshScreen();

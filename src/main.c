@@ -52,7 +52,7 @@
 #include "log/log.h"
 
 theme_t* EdTheme = NULL;
-struct editorConfig E;
+editor_t E;
 language_arr_t* L_Arr = NULL;
 
 /*** terminal ***/
