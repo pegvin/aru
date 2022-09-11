@@ -29,9 +29,9 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Install Git, Scons & cmake
+    - name: Install Git, Scons, cmake & libtre
       run: |
-        sudo apt-get install git scons cmake
+        sudo apt-get install git scons cmake libtre-dev libtre5
 
     - name: Build & Install json-c
       run: | # XX - Build Static Library & Use That Instead
@@ -64,9 +64,9 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Install scons & cmake
+    - name: Install scons, cmake & libtre
       run: |
-        brew install scons cmake
+        brew install scons cmake libtre
 
     - name: Build & Install json-c
       run: | # XX - Build Static Library & Use That Instead
