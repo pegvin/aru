@@ -66,7 +66,7 @@ jobs:
 
     - name: Install scons, cmake & libtre
       run: |
-        brew install scons cmake tre
+        brew install scons cmake tre autoconf automake libtool
 
     - name: Build & Install json-c
       run: | # XX - Build Static Library & Use That Instead
@@ -78,6 +78,16 @@ jobs:
         cmake -DBUILD_SHARED_LIBS=On -DCMAKE_BUILD_TYPE=Release ..
         make
         sudo make install
+
+    - name: Build and install libtre
+      run: |
+        cd ..
+        git clone https://github.com/laurikari/tre --recursive
+        cd tre
+        ./utils/autogen.sh
+        ./configure
+        make
+        make install
 
     - name: Build
       run: make gen-assets release
