@@ -1,0 +1,20 @@
+{
+	"name": "C++",
+	"keywords": [
+		"asm", "auto", "catch", "class", "const",
+		"default", "delete", "do", "extern", "friend",
+		"goto", "inline", "new", "operator", "private",
+		"protected", "public", "register", "sizeof",
+		"template", "this", "throw", "try", "virtual",
+		"volatile", "switch", "if", "while", "for", "break",
+		"continue", "return", "else", "struct", "union",
+		"typedef", "static", "enum", "case",
+
+		"int|", "long|", "double|", "float|", "short|",
+		"char|", "unsigned|", "signed|", "void|", "signed|"
+	],
+	"extensions": [ ".cpp", ".hpp", ".hh", ".cc", ".inl" ],
+	"sCommentStart": "//",
+	"mCommentStart": "/*",
+	"mCommentEnd": "*/"
+}

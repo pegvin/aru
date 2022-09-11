@@ -8,8 +8,8 @@
 		"int|", "long|", "double|", "float|",
 		"char|", "unsigned|", "signed|", "void|"
 	],
-	"extensions": [ ".c", ".h", ".cpp" ],
+	"extensions": [ ".c", ".h", ".inl" ],
 	"sCommentStart": "//",
 	"mCommentStart": "/*",
-	"mCommentEnd": "*/",
+	"mCommentEnd": "*/"
 }
