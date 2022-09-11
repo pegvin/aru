@@ -1,7 +1,10 @@
 #ifndef LANGUAGE_H
 #define LANGUAGE_H
 
+#include <tre/tre.h>
+
 #include "main.h"
+#include "pattern.h"
 
 #define HL_HIGHLIGHT_NUMBERS (1<<0)
 #define HL_HIGHLIGHT_STRINGS (1<<1)
@@ -15,6 +18,8 @@ struct editorSyntax {
 	int        totalKeywords1;
 	char**     keywords2;
 	int        totalKeywords2;
+	pattern_t**  patterns;
+	int          totalPatterns;
 	char*      singleline_comment_start; // Single-Line Comment Start Like "//"
 	char*      multiline_comment_start;  // Multi-Line Comment Start Like "/*"
 	char*      multiline_comment_end;    // Multi-Line Comment Start Like "*/"

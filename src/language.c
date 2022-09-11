@@ -4,6 +4,7 @@
 #include "language.h"
 #include "log/log.h"
 #include "assets.h"
+#include "pattern.h"
 
 char* _strdup(const char *str) {
 	if (str == NULL) return NULL;
@@ -50,6 +51,7 @@ language_t* LoadLanguage(const char* jsonText) {
 	struct json_object* keyword;
 	struct json_object* keywords1;
 	struct json_object* keywords2;
+	struct json_object* patterns;
 	struct json_object* extension;
 	struct json_object* extensions;
 	struct json_object* ParsedJSON;
@@ -61,11 +63,13 @@ language_t* LoadLanguage(const char* jsonText) {
 	int totalKeywords1 = -1;
 	int totalKeywords2 = -1;
 	int totalExtensions = -1;
+	int totalPatternsFound = 0;
 
 	ParsedJSON = json_tokener_parse(jsonText);
 	json_object_object_get_ex(ParsedJSON, "name", &name);
 	json_object_object_get_ex(ParsedJSON, "keywords1", &keywords1);
 	json_object_object_get_ex(ParsedJSON, "keywords2", &keywords2);
+	json_object_object_get_ex(ParsedJSON, "patterns", &patterns);
 	json_object_object_get_ex(ParsedJSON, "extensions", &extensions);
 	json_object_object_get_ex(ParsedJSON, "sCommentStart", &sCommentStart);
 	json_object_object_get_ex(ParsedJSON, "mCommentStart", &mCommentStart);
@@ -103,6 +107,25 @@ language_t* LoadLanguage(const char* jsonText) {
 		for (int i = 0; i < totalKeywords2; ++i) {
 			keyword = json_object_array_get_idx(keywords2, i);
 			L->keywords2[i] = _strdup(json_object_get_string(keyword));
+		}
+	}
+
+	if (json_object_get_type(patterns) != json_type_array) {
+		L->totalPatterns = 0;
+		L->patterns = NULL;
+		log_error("%s - patterns is not an array...", L->name);
+	} else {
+		totalPatternsFound = json_object_array_length(patterns);
+		L->totalPatterns = 0;
+		L->patterns = malloc(sizeof(pattern_t*) * totalPatternsFound);
+		for (int i = 0; i < totalPatternsFound; ++i) {
+			struct json_object* pattern = json_object_array_get_idx(patterns, i);
+			if (json_object_get_type(pattern) == json_type_object) {
+				struct json_object* regex = NULL;
+				json_object_object_get_ex(pattern, "pattern", &regex);
+				L->patterns[i] = LoadPattern(json_object_get_string(regex));
+				L->totalPatterns++;
+			}
 		}
 	}
 
@@ -193,6 +216,17 @@ void FreeLanguage(language_t* L) {
 		}
 		free(L->keywords2);
 		L->keywords2 = NULL;
+	}
+
+	if (L->patterns != NULL) {
+		for (int i = 0; i < L->totalPatterns; ++i) {
+			if (L->patterns[i] != NULL) {
+				FreePattern(L->patterns[i]);
+				L->patterns[i] = NULL;
+			}
+		}
+		free(L->patterns);
+		L->patterns = NULL;
 	}
 
 	if (L->singleline_comment_start != NULL) {

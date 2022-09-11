@@ -9,6 +9,12 @@
 		"int", "long", "double", "float",
 		"char", "unsigned", "signed", "void"
 	],
+	"patterns": [
+		{
+			"pattern": "#%s*include%s()<.->",
+			"type": "lmao"
+		}
+	],
 	"extensions": [ ".c", ".h", ".inl" ],
 	"sCommentStart": "//",
 	"mCommentStart": "/*",
