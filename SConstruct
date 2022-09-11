@@ -97,12 +97,12 @@ def GatherFiles(Directories):
 	return files
 
 # Get all the c and c++ files in src, recursively.
-sources = GatherFiles(['src/'])
+sources = GatherFiles(['src/', 'lib/log/'])
 
 # Header Directories.
 env.Append(
-	CPATH=['src/'],
-	CPPPATH=['src/']
+	CPATH=['src/', 'lib/'],
+	CPPPATH=['src/', 'lib/']
 )
 
 # Windows compilation support.
@@ -112,7 +112,10 @@ if target_os != 'msys':
 		CFLAGS=['-Wall', '-Wno-unknown-pragma']
 	)
 
-env.Append(LIBS=['json-c'])
+env.Append(
+	LIBS=['json-c'],
+	CCFLAGS=['-DLOG_USE_COLOR']
+)
 
 # Append external environment flags
 env.Append(
