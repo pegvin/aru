@@ -66,7 +66,7 @@ jobs:
 
     - name: Install scons, cmake & libtre
       run: |
-        brew install scons cmake tre autoconf automake libtool
+        brew install scons cmake tre autoconf automake libtool gettext
 
     - name: Build & Install json-c
       run: | # XX - Build Static Library & Use That Instead
