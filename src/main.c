@@ -51,8 +51,8 @@
 #include "language.h"
 #include "log/log.h"
 
+editor_t E; // Holds Configuration & Stuff About Editor
 theme_t* EdTheme = NULL;
-editor_t E;
 language_arr_t* L_Arr = NULL;
 
 /*** terminal ***/
