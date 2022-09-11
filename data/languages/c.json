@@ -9,6 +9,16 @@
 		"int", "long", "double", "float",
 		"char", "unsigned", "signed", "void"
 	],
+	"patterns": [
+		{
+			"pattern": "0x%x+",
+			"type": "number"
+		},
+		{
+			"pattern": "#%s*include%s()<.->",
+			"type": "string"
+		}
+	],
 	"extensions": [ ".c", ".h", ".inl" ],
 	"sCommentStart": "//",
 	"mCommentStart": "/*",

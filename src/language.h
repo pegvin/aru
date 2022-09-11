@@ -1,8 +1,6 @@
 #ifndef LANGUAGE_H
 #define LANGUAGE_H
 
-#include <tre/tre.h>
-
 #define HL_HIGHLIGHT_NUMBERS (1<<0)
 #define HL_HIGHLIGHT_STRINGS (1<<1)
 
