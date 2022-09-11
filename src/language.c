@@ -48,7 +48,8 @@ void printJsonType(json_type type) {
 language_t* LoadLanguage(const char* jsonText) {
 	struct json_object* name;
 	struct json_object* keyword;
-	struct json_object* keywords;
+	struct json_object* keywords1;
+	struct json_object* keywords2;
 	struct json_object* extension;
 	struct json_object* extensions;
 	struct json_object* ParsedJSON;
@@ -57,49 +58,65 @@ language_t* LoadLanguage(const char* jsonText) {
 	struct json_object* mCommentEnd;
 	language_t* L = NULL;
 
-	int totalKeywords = -1;
+	int totalKeywords1 = -1;
+	int totalKeywords2 = -1;
 	int totalExtensions = -1;
 
 	ParsedJSON = json_tokener_parse(jsonText);
 	json_object_object_get_ex(ParsedJSON, "name", &name);
-	json_object_object_get_ex(ParsedJSON, "keywords", &keywords);
+	json_object_object_get_ex(ParsedJSON, "keywords1", &keywords1);
+	json_object_object_get_ex(ParsedJSON, "keywords2", &keywords2);
 	json_object_object_get_ex(ParsedJSON, "extensions", &extensions);
 	json_object_object_get_ex(ParsedJSON, "sCommentStart", &sCommentStart);
 	json_object_object_get_ex(ParsedJSON, "mCommentStart", &mCommentStart);
 	json_object_object_get_ex(ParsedJSON, "mCommentEnd", &mCommentEnd);
 
 	L = malloc(sizeof(language_t));
-	L->filetype = _strdup(json_object_get_string(name));
+	L->name = _strdup(json_object_get_string(name));
 	L->singleline_comment_start = _strdup(json_object_get_string(sCommentStart));
 	L->multiline_comment_start = _strdup(json_object_get_string(mCommentStart));
 	L->multiline_comment_end = _strdup(json_object_get_string(mCommentEnd));
 	L->flags = HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS;
 
-	if (json_object_get_type(keywords) != json_type_array) {
-		L->totalKeywords = 0;
-		L->keywords = NULL;
-		log_error("keywords is not an array...");
+	if (json_object_get_type(keywords1) != json_type_array) {
+		L->totalKeywords1 = 0;
+		L->keywords1 = NULL;
+		log_error("keywords1 is not an array...");
 	} else {
-		totalKeywords = json_object_array_length(keywords);
-		L->totalKeywords = totalKeywords;
-		L->keywords = malloc(sizeof(char*) * totalKeywords);
-		for (int i = 0; i < totalKeywords; ++i) {
-			keyword = json_object_array_get_idx(keywords, i);
-			L->keywords[i] = _strdup(json_object_get_string(keyword));
+		totalKeywords1 = json_object_array_length(keywords1);
+		L->totalKeywords1 = totalKeywords1;
+		L->keywords1 = malloc(sizeof(char*) * totalKeywords1);
+		for (int i = 0; i < totalKeywords1; ++i) {
+			keyword = json_object_array_get_idx(keywords1, i);
+			L->keywords1[i] = _strdup(json_object_get_string(keyword));
+		}
+	}
+
+	if (json_object_get_type(keywords2) != json_type_array) {
+		L->totalKeywords2 = 0;
+		L->keywords2 = NULL;
+		log_error("keywords2 is not an array...");
+	} else {
+		totalKeywords2 = json_object_array_length(keywords2);
+		L->totalKeywords2 = totalKeywords2;
+		L->keywords2 = malloc(sizeof(char*) * totalKeywords2);
+		for (int i = 0; i < totalKeywords2; ++i) {
+			keyword = json_object_array_get_idx(keywords2, i);
+			L->keywords2[i] = _strdup(json_object_get_string(keyword));
 		}
 	}
 
 	if (json_object_get_type(extensions) != json_type_array) {
-		L->totalMatches = 0;
-		L->filematch = NULL;
+		L->totalExtensions = 0;
+		L->extensions = NULL;
 		log_error("extensions is not an array...");
 	} else {
 		totalExtensions = json_object_array_length(extensions);
-		L->totalMatches = totalExtensions;
-		L->filematch = malloc(sizeof(char*) * totalExtensions);
+		L->totalExtensions = totalExtensions;
+		L->extensions = malloc(sizeof(char*) * totalExtensions);
 		for (int i = 0; i < totalExtensions; ++i) {
 			extension = json_object_array_get_idx(extensions, i);
-			L->filematch[i] = _strdup(json_object_get_string(extension));
+			L->extensions[i] = _strdup(json_object_get_string(extension));
 		}
 	}
 
@@ -111,7 +128,7 @@ onFail:
 	mCommentEnd = NULL;
 	name = NULL;
 	keyword = NULL;
-	keywords = NULL;
+	keywords1 = NULL;
 	extension = NULL;
 	extensions = NULL;
 	ParsedJSON = NULL;
@@ -147,26 +164,26 @@ void FreeLanguageArr(language_arr_t* L_Arr) {
 void FreeLanguage(language_t* L) {
 	if (L == NULL) return;
 
-	if (L->filematch != NULL) {
-		for (int i = 0; i < L->totalMatches; ++i) {
-			if (L->filematch[i] != NULL) {
-				free(L->filematch[i]);
-				L->filematch[i] = NULL;
+	if (L->extensions != NULL) {
+		for (int i = 0; i < L->totalExtensions; ++i) {
+			if (L->extensions[i] != NULL) {
+				free(L->extensions[i]);
+				L->extensions[i] = NULL;
 			}
 		}
-		free(L->filematch);
-		L->filematch = NULL;
+		free(L->extensions);
+		L->extensions = NULL;
 	}
 
-	if (L->keywords != NULL) {
-		for (int i = 0; i < L->totalKeywords; ++i) {
-			if (L->keywords[i] != NULL) {
-				free(L->keywords[i]);
-				L->keywords[i] = NULL;
+	if (L->keywords1 != NULL) {
+		for (int i = 0; i < L->totalKeywords1; ++i) {
+			if (L->keywords1[i] != NULL) {
+				free(L->keywords1[i]);
+				L->keywords1[i] = NULL;
 			}
 		}
-		free(L->keywords);
-		L->keywords = NULL;
+		free(L->keywords1);
+		L->keywords1 = NULL;
 	}
 
 	if (L->singleline_comment_start != NULL) {
@@ -185,8 +202,8 @@ void FreeLanguage(language_t* L) {
 	}
 
 	L->flags = 0;
-	L->totalKeywords = -1;
-	L->totalMatches = -1;
+	L->totalKeywords1 = -1;
+	L->totalExtensions = -1;
 	free(L);
 }
 

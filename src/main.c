@@ -52,31 +52,7 @@
 
 theme_t* EdTheme = NULL;
 struct editorConfig E;
-
-/*** filetypes ***/
-
-// char *C_HL_extensions[] = { ".c", ".h", ".cpp", NULL };
-// char *C_HL_keywords[] = {
-// 	"switch", "if", "while", "for", "break", "continue", "return", "else",
-// 	"struct", "union", "typedef", "static", "enum", "class", "case",
-
-// 	"int|", "long|", "double|", "float|", "char|", "unsigned|", "signed|",
-// 	"void|", NULL
-// };
-
 language_arr_t* L_Arr = NULL;
-
-// struct editorSyntax HLDB[] = {
-// 	{
-// 		"c",
-// 		C_HL_extensions,
-// 		C_HL_keywords,
-// 		"//", "/*", "*/",
-// 		HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS
-// 	},
-// };
-
-// int HLDB_ENTRIES = 1;
 
 /*** terminal ***/
 
@@ -202,7 +178,8 @@ void editorUpdateSyntax(erow *row) {
 
 	if (E.syntax == NULL) return;
 
-	char** keywords = E.syntax->keywords;
+	char** keywords1 = E.syntax->keywords1;
+	char** keywords2 = E.syntax->keywords2;
 
 	char* scs = E.syntax->singleline_comment_start;
 	char* mcs = E.syntax->multiline_comment_start;
@@ -283,19 +260,31 @@ void editorUpdateSyntax(erow *row) {
 
 		if (prev_sep) {
 			int j;
-			for (j = 0; j < E.syntax->totalKeywords; j++) {
-				int klen = strlen(keywords[j]);
-				int kw2 = keywords[j][klen - 1] == '|';
-				if (kw2) klen--;
-
-				if (!strncmp(&row->render[i], keywords[j], klen) && is_separator(row->render[i + klen])) {
-					memset(&row->hl[i], kw2 ? HL_KEYWORD2 : HL_KEYWORD1, klen);
+			for (j = 0; j < E.syntax->totalKeywords1; j++) {
+				int klen = strlen(keywords1[j]);
+				if (!strncmp(&row->render[i], keywords1[j], klen) && is_separator(row->render[i + klen])) {
+					memset(&row->hl[i], HL_KEYWORD1, klen);
 					i += klen;
 					break;
 				}
 			}
-			if (j > 0 && j < E.syntax->totalKeywords) {
-				if (keywords[j] != NULL) {
+			if (j > 0 && j < E.syntax->totalKeywords1) {
+				if (keywords1[j] != NULL) {
+					prev_sep = 0;
+					continue;
+				}
+			}
+
+			for (j = 0; j < E.syntax->totalKeywords2; j++) {
+				int klen = strlen(keywords2[j]);
+				if (!strncmp(&row->render[i], keywords2[j], klen) && is_separator(row->render[i + klen])) {
+					memset(&row->hl[i], HL_KEYWORD2, klen);
+					i += klen;
+					break;
+				}
+			}
+			if (j > 0 && j < E.syntax->totalKeywords2) {
+				if (keywords2[j] != NULL) {
 					prev_sep = 0;
 					continue;
 				}
@@ -333,10 +322,10 @@ void editorSelectSyntaxHighlight() {
 
 	for (unsigned int j = 0; j < L_Arr->numOfLangs; j++) {
 		language_t* s = L_Arr->languages[j];
-		for (int i = 0; i < s->totalMatches; ++i) {
-			printf("%s\n", s->filematch[i]);
-			int is_ext = (s->filematch[i][0] == '.');
-			if ((is_ext && ext && !strcmp(ext, s->filematch[i])) || (!is_ext && strstr(E.filename, s->filematch[i]))) {
+		for (int i = 0; i < s->totalExtensions; ++i) {
+			printf("%s\n", s->extensions[i]);
+			int is_ext = (s->extensions[i][0] == '.');
+			if ((is_ext && ext && !strcmp(ext, s->extensions[i])) || (!is_ext && strstr(E.filename, s->extensions[i]))) {
 				E.syntax = s;
 
 				int filerow;
@@ -769,7 +758,7 @@ void editorDrawStatusBar(struct abuf *ab) {
 		E.filename ? E.filename : "[No Name]", E.numrows,
 		E.dirty ? "(modified)" : "");
 	int rlen = snprintf(rstatus, sizeof(rstatus), "%s | %d/%d",
-		E.syntax ? E.syntax->filetype : "no ft", E.cy + 1, E.numrows);
+		E.syntax ? E.syntax->name : "no ft", E.cy + 1, E.numrows);
 	if (len > E.screencols) len = E.screencols;
 	abAppend(ab, status, len);
 	while (len < E.screencols) {

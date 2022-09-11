@@ -1,15 +1,19 @@
 #ifndef LANGUAGE_H
 #define LANGUAGE_H
 
+#include <tre/tre.h>
+
 #define HL_HIGHLIGHT_NUMBERS (1<<0)
 #define HL_HIGHLIGHT_STRINGS (1<<1)
 
 struct editorSyntax {
-	char*  filetype;      // Language Name Like C
-	char** filematch;     // Array Of File Extensions Like .c, .h, .cpp
-	int    totalMatches;  // Total Elements in "filematch"
-	char** keywords;      // Array Of Language Keywords
-	int    totalKeywords; // Total Elements in "keywords"
+	char*  name;          // Language Name
+	char** extensions;     // Array Of File Extensions Like .c, .h, .cpp
+	int    totalExtensions;  // Total Elements in "extensions"
+	char** keywords1;
+	int    totalKeywords1;
+	char** keywords2;
+	int    totalKeywords2;
 	char*  singleline_comment_start; // Single-Line Comment Start Like "//"
 	char*  multiline_comment_start;  // Multi-Line Comment Start Like "/*"
 	char*  multiline_comment_end;    // Multi-Line Comment Start Like "*/"
