@@ -35,7 +35,7 @@ enum editorKey {
 	PAGE_DOWN
 };
 
-enum editorHighlight {
+typedef enum editorHighlight {
 	HL_NORMAL = 0,
 	HL_COMMENT,
 	HL_MLCOMMENT,
@@ -44,7 +44,7 @@ enum editorHighlight {
 	HL_STRING,
 	HL_NUMBER,
 	HL_MATCH
-};
+} syntax_color_t;
 
 typedef struct erow {
 	int idx;

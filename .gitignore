@@ -41,6 +41,7 @@
 *.su
 *.idb
 *.pdb
+*.log
 
 # Kernel Module Compile Results
 *.mod*
@@ -54,7 +55,6 @@ dkms.conf
 .sconsign.dblite
 .sconf_temp
 imgui.ini
-config.log
 .DS_Store
 xcuserdata/
 todo

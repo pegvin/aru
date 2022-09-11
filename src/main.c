@@ -49,6 +49,7 @@
 #include "colors.h"
 #include "assets.h"
 #include "language.h"
+#include "log/log.h"
 
 theme_t* EdTheme = NULL;
 struct editorConfig E;
@@ -194,6 +195,7 @@ void editorUpdateSyntax(erow *row) {
 	int in_comment = (row->idx > 0 && E.row[row->idx - 1].hl_open_comment);
 
 	int i = 0;
+	// Iterate Over Whole Line
 	while (i < row->rsize) {
 		char c = row->render[i];
 		unsigned char prev_hl = (i > 0) ? row->hl[i - 1] : HL_NORMAL;
@@ -259,11 +261,11 @@ void editorUpdateSyntax(erow *row) {
 		}
 
 		if (prev_sep) {
-			int j;
+			int j = 0;
 			for (j = 0; j < E.syntax->totalKeywords1; j++) {
 				int klen = strlen(keywords1[j]);
 				if (!strncmp(&row->render[i], keywords1[j], klen) && is_separator(row->render[i + klen])) {
-					memset(&row->hl[i], HL_KEYWORD1, klen);
+					memset(&row->hl[i], HL_KEYWORD1, klen); // Set that whole block of memory to HL_XXXX upto "klen"
 					i += klen;
 					break;
 				}
@@ -323,7 +325,6 @@ void editorSelectSyntaxHighlight() {
 	for (unsigned int j = 0; j < L_Arr->numOfLangs; j++) {
 		language_t* s = L_Arr->languages[j];
 		for (int i = 0; i < s->totalExtensions; ++i) {
-			printf("%s\n", s->extensions[i]);
 			int is_ext = (s->extensions[i][0] == '.');
 			if ((is_ext && ext && !strcmp(ext, s->extensions[i])) || (!is_ext && strstr(E.filename, s->extensions[i]))) {
 				E.syntax = s;
@@ -993,7 +994,20 @@ void initEditor() {
 	E.screenrows -= 2;
 }
 
+void FreeEverything(void) {
+	if (EdTheme != NULL) FreeTheme(EdTheme);
+	if (L_Arr != NULL) FreeLanguageArr(L_Arr);
+
+	EdTheme = NULL;
+	L_Arr = NULL;
+}
+
 int main(int argc, char *argv[]) {
+	atexit(FreeEverything);
+
+	FILE* LogFilePtr = fopen("aru.log", "w");
+	log_add_fp(LogFilePtr, LOG_TRACE);
+
 	L_Arr = LoadAllLanguages();
 	EdTheme = ThemeLoadFrom(AssetsGet("data/themes/dark.json", NULL));
 	enableRawMode();
@@ -1009,10 +1023,7 @@ int main(int argc, char *argv[]) {
 		editorRefreshScreen();
 		editorProcessKeypress();
 	}
-
-	FreeTheme(EdTheme);
-	FreeLanguageArr(L_Arr);
-	EdTheme = NULL;
-	L_Arr = NULL;
+	fclose(LogFilePtr);
+	LogFilePtr = NULL;
 	return 0;
 }

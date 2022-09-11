@@ -120,9 +120,7 @@ language_t* LoadLanguage(const char* jsonText) {
 		}
 	}
 
-onFail:
 	while (json_object_put(ParsedJSON) != 1) {}
-	name = NULL;
 	sCommentStart = NULL;
 	mCommentStart = NULL;
 	mCommentEnd = NULL;
@@ -184,6 +182,17 @@ void FreeLanguage(language_t* L) {
 		}
 		free(L->keywords1);
 		L->keywords1 = NULL;
+	}
+
+	if (L->keywords2 != NULL) {
+		for (int i = 0; i < L->totalKeywords2; ++i) {
+			if (L->keywords2[i] != NULL) {
+				free(L->keywords2[i]);
+				L->keywords2[i] = NULL;
+			}
+		}
+		free(L->keywords2);
+		L->keywords2 = NULL;
 	}
 
 	if (L->singleline_comment_start != NULL) {

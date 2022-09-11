@@ -3,21 +3,11 @@
 	"keywords1": [
 		"switch", "if", "while", "for", "break",
 		"continue", "return", "else", "struct", "union",
-		"typedef", "static", "enum", "class", "case",
+		"typedef", "static", "enum", "class", "case"
 	],
 	"keywords2": [
 		"int", "long", "double", "float",
 		"char", "unsigned", "signed", "void"
-	],
-	"patterns": [
-		{
-			"pattern": "0x%x+",
-			"type": "number"
-		},
-		{
-			"pattern": "#%s*include%s()<.->",
-			"type": "string"
-		}
 	],
 	"extensions": [ ".c", ".h", ".inl" ],
 	"sCommentStart": "//",
