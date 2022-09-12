@@ -87,7 +87,7 @@ jobs:
         ./utils/autogen.sh
         ./configure
         make
-        make install
+        sudo make install
 
     - name: Build
       run: make gen-assets release
