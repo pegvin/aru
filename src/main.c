@@ -48,14 +48,13 @@
 #include "theme.h"
 #include "colors.h"
 #include "assets.h"
+#include "helpers.h"
 #include "language.h"
 #include "log/log.h"
 
 editor_t E; // Holds Configuration & Stuff About Editor
 theme_t* EdTheme = NULL;
 language_arr_t* L_Arr = NULL;
-
-/*** terminal ***/
 
 void die(const char *s) {
 	write(STDOUT_FILENO, "\x1b[2J", 4);
@@ -267,17 +266,17 @@ void editorUpdateSyntax(erow *row) {
 			int j = 0;
 			for (j = 0; j < E.syntax->totalPatterns; j++) {
 				pattern_t* p = E.syntax->patterns[j];
-			    regmatch_t matches[1];
-			    int result = tre_regexec(p->regex, &row->render[i], 1, matches, 0);
-			    int klen = -1;
-			    if (result == REG_OK) {
-			    	klen = matches[0].rm_eo - matches[0].rm_so;
-			    	if (klen > 0) {
+				regmatch_t matches[1];
+				int result = tre_regexec(p->regex, &row->render[i], 1, matches, 0);
+				int klen = -1;
+				if (result == REG_OK) {
+					klen = matches[0].rm_eo - matches[0].rm_so;
+					if (klen > 0) {
 						memset((&row->hl[i]) + matches[0].rm_so, p->color, klen);
-				    	i += matches[0].rm_eo;
-				    };
-			    	break;
-			    }
+						i += matches[0].rm_eo;
+					};
+					break;
+				}
 			}
 
 			for (j = 0; j < E.syntax->totalKeywords1; j++) {
@@ -537,23 +536,26 @@ char *editorRowsToString(int *buflen) {
 }
 
 void editorOpen(char *filename) {
-	free(E.filename);
-	E.filename = strdup(filename);
+	if (E.filename != NULL)
+		free(E.filename);
 
+	E.filename = _strdup(filename);
 	editorSelectSyntaxHighlight();
 
-	FILE *fp = fopen(filename, "r");
+	FILE *fp = fopen(filename, "r+");
 	if (!fp) die("fopen");
 
 	char *line = NULL;
 	size_t linecap = 0;
 	ssize_t linelen;
+
 	while ((linelen = getline(&line, &linecap, fp)) != -1) {
-		while (linelen > 0 && (line[linelen - 1] == '\n' ||
-													 line[linelen - 1] == '\r'))
+		while (linelen > 0 && (line[linelen - 1] == '\n' || line[linelen - 1] == '\r'))
 			linelen--;
+
 		editorInsertRow(E.numrows, line, linelen);
 	}
+
 	free(line);
 	fclose(fp);
 	E.dirty = 0;
@@ -579,7 +581,7 @@ void editorSave() {
 				close(fd);
 				free(buf);
 				E.dirty = 0;
-				editorSetStatusMessage("%d bytes written to disk", len);
+				editorSetStatusMessage("%s written to disk", formatBytes(len));
 				return;
 			}
 		}
@@ -1030,9 +1032,7 @@ int main(int argc, char *argv[]) {
 	EdTheme = ThemeLoadFrom(AssetsGet("data/themes/dark.json", NULL));
 	enableRawMode();
 	initEditor();
-	if (argc >= 2) {
-		editorOpen(argv[1]);
-	}
+	if (argc >= 2) editorOpen(argv[1]);
 
 	editorSetStatusMessage(
 		"HELP: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F = find");
