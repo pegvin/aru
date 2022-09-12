@@ -9,6 +9,7 @@ a text editor
 - [x] Syntax Highlighting
 - [x] Opening, Closing & Saving Files
 - [ ] Windows Support (Unsure)
+- [ ] Try [pcre2](https://github.com/PCRE2Project/pcre2) for "advanced" regex
 - [ ] Undo-Redo
 - [x] Custom Themes and Syntaxes
 - [ ] Opening a file in editor itself
