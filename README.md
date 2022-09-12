@@ -8,7 +8,7 @@ a text editor
 - [x] Simple Text Editing
 - [x] Syntax Highlighting
 - [x] Opening, Closing & Saving Files
-- [ ] Windows Support
+- [ ] Windows Support (Unsure)
 - [ ] Undo-Redo
 - [x] Custom Themes and Syntaxes
 - [ ] Opening a file in editor itself
