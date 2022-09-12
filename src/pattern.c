@@ -1,3 +1,5 @@
+#include <stdlib.h>
+#include <string.h>
 #include "colors.h"
 #include "pattern.h"
 #include "helpers.h"
