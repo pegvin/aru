@@ -273,7 +273,7 @@ void editorUpdateSyntax(erow *row) {
 			    if (result == REG_OK) {
 			    	klen = matches[0].rm_eo - matches[0].rm_so;
 			    	if (klen > 0) {
-						memset((&row->hl[i]) + matches[0].rm_so, HL_NUMBER, klen);
+						memset((&row->hl[i]) + matches[0].rm_so, p->color, klen);
 				    	i += matches[0].rm_eo;
 				    };
 			    	break;
