@@ -5,15 +5,7 @@
 #include "log/log.h"
 #include "assets.h"
 #include "pattern.h"
-
-char* _strdup(const char *str) {
-	if (str == NULL) return NULL;
-
-	int n = strlen(str) + 1;
-	char *dup = malloc(n);
-	if(dup) strcpy(dup, str);
-	return dup;
-}
+#include "helpers.h"
 
 #if IS_DEBUG
 void printJsonType(json_type type) {
@@ -122,8 +114,10 @@ language_t* LoadLanguage(const char* jsonText) {
 			struct json_object* pattern = json_object_array_get_idx(patterns, i);
 			if (json_object_get_type(pattern) == json_type_object) {
 				struct json_object* regex = NULL;
+				struct json_object* type = NULL;
 				json_object_object_get_ex(pattern, "pattern", &regex);
-				L->patterns[i] = LoadPattern(json_object_get_string(regex));
+				json_object_object_get_ex(pattern, "type", &type);
+				L->patterns[i] = LoadPattern(json_object_get_string(regex), json_object_get_string(type));
 				L->totalPatterns++;
 			}
 		}

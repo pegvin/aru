@@ -6,7 +6,7 @@
 		"typedef", "static", "enum", "class", "case"
 	],
 	"keywords2": [
-		"long", "double", "float",
+		"int", "long", "double", "float",
 		"char", "unsigned", "signed", "void"
 	],
 	"patterns": [
@@ -16,7 +16,7 @@
 		},
 		{
 			"pattern": "(^#define*)|(^#include*)",
-			"type": "number"
+			"type": "keyword2"
 		}
 	],
 	"extensions": [ ".c", ".h", ".inl" ],

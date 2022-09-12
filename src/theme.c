@@ -2,10 +2,10 @@
 #include <stdlib.h>
 #include <string.h>
 #include <json-c/json.h>
-#include <ctype.h>
 
 #include "theme.h"
 #include "colors.h"
+#include "helpers.h"
 
 #if IS_DEBUG
 void printColor(int color) {
@@ -59,12 +59,6 @@ void printTheme(theme_t* t) {
 	printColor(t->MATCH);
 }
 #endif // IS_DEBUG
-
-void strLower(char* str, int len) {
-	for (int i = 0; i < len; ++i) {
-		str[i] = tolower(str[i]);
-	}
-}
 
 void _set_color(char* name, char* value, theme_t* t) {
 	int* color = NULL;
