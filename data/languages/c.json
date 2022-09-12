@@ -6,13 +6,17 @@
 		"typedef", "static", "enum", "class", "case"
 	],
 	"keywords2": [
-		"int", "long", "double", "float",
+		"long", "double", "float",
 		"char", "unsigned", "signed", "void"
 	],
 	"patterns": [
 		{
-			"pattern": "#%s*include%s()<.->",
-			"type": "lmao"
+			"pattern": "//.*",
+			"type": "comment"
+		},
+		{
+			"pattern": "(^#define*)|(^#include*)",
+			"type": "number"
 		}
 	],
 	"extensions": [ ".c", ".h", ".inl" ],

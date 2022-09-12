@@ -251,8 +251,11 @@ void editorUpdateSyntax(erow *row) {
 		}
 
 		if (E.syntax->flags & HL_HIGHLIGHT_NUMBERS) {
-			if ((isdigit(c) && (prev_sep || prev_hl == HL_NUMBER)) ||
-					(c == '.' && prev_hl == HL_NUMBER)) {
+			if ((isdigit(c) && (prev_sep || prev_hl == HL_NUMBER)) || (c == '.' && prev_hl == HL_NUMBER)) {
+				if (row->render[i - 1] == '-') { // Check for negative sign
+					row->hl[i - 1] = HL_NUMBER;
+				}
+
 				row->hl[i] = HL_NUMBER;
 				i++;
 				prev_sep = 0;
@@ -262,6 +265,21 @@ void editorUpdateSyntax(erow *row) {
 
 		if (prev_sep) {
 			int j = 0;
+			for (j = 0; j < E.syntax->totalPatterns; j++) {
+				pattern_t* p = E.syntax->patterns[j];
+			    regmatch_t matches[1];
+			    int result = tre_regexec(p->regex, &row->render[i], 1, matches, 0);
+			    int klen = -1;
+			    if (result == REG_OK) {
+			    	klen = matches[0].rm_eo - matches[0].rm_so;
+			    	if (klen > 0) {
+						memset((&row->hl[i]) + matches[0].rm_so, HL_NUMBER, klen);
+				    	i += matches[0].rm_eo;
+				    };
+			    	break;
+			    }
+			}
+
 			for (j = 0; j < E.syntax->totalKeywords1; j++) {
 				int klen = strlen(keywords1[j]);
 				if (!strncmp(&row->render[i], keywords1[j], klen) && is_separator(row->render[i + klen])) {
