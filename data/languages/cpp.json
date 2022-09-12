@@ -1,7 +1,7 @@
 {
 	"name": "C++",
 	"keywords1": [
-		"asm", "auto", "catch", "class", "const",
+		"asm", "auto", "catch", "class", "NULL",
 		"default", "delete", "do", "extern", "friend",
 		"goto", "inline", "new", "operator", "private",
 		"protected", "public", "register", "sizeof",
@@ -11,8 +11,18 @@
 		"typedef", "static", "enum", "case"
 	],
 	"keywords2": [
-		"int", "long", "double", "float", "short",
+		"int", "long", "double", "float", "short", "const",
 		"char", "unsigned", "signed", "void", "signed"
+	],
+	"patterns": [
+		{
+			"pattern": "//.*",
+			"type": "comment"
+		},
+		{
+			"pattern": "(^#define*)|(^#include*)|(^#if*)|(^#ifndef*)|(^#endif*)|(^#else*)|(^#warn*)|(^#error*)",
+			"type": "keyword2"
+		}
 	],
 	"extensions": [ ".cpp", ".hpp", ".hh", ".cc", ".inl" ],
 	"sCommentStart": "//",

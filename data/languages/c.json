@@ -15,7 +15,7 @@
 			"type": "comment"
 		},
 		{
-			"pattern": "(^#define*)|(^#include*)",
+			"pattern": "(^#define*)|(^#include*)|(^#if*)|(^#ifndef*)|(^#endif*)|(^#else*)|(^#warn*)|(^#error*)",
 			"type": "keyword2"
 		}
 	],
