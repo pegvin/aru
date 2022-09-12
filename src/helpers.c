@@ -21,7 +21,10 @@ void strLower(char* str, int len) {
 	}
 }
 
-// Returns A String Containing The Number of Bytes in A readable format
+/*
+	Returns A String Containing The Number of Bytes in A readable format
+	Converted From: https://stackoverflow.com/a/18650828/14516016
+*/
 char* formatBytes(int bytes) {
 	static char newStr[512] = "";
 	const int k = 1024;
