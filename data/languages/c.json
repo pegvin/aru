@@ -1,7 +1,7 @@
 {
 	"name": "C",
 	"keywords1": [
-		"switch", "if", "while", "for", "break",
+		"switch", "if", "while", "for", "break", "NULL",
 		"continue", "return", "else", "struct", "union",
 		"typedef", "static", "enum", "class", "case"
 	],
