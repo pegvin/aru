@@ -166,7 +166,7 @@ void FreeLanguageArr(language_arr_t* L_Arr) {
 
 	for (int i = 0; i < L_Arr->numOfLangs; ++i) {
 		if (L_Arr->languages[i] != NULL) {
-			free(L_Arr->languages[i]);
+			FreeLanguage(L_Arr->languages[i]);
 			L_Arr->languages[i] = NULL;
 		}
 	}
@@ -174,6 +174,7 @@ void FreeLanguageArr(language_arr_t* L_Arr) {
 	free(L_Arr->languages);
 	L_Arr->languages = NULL;
 	L_Arr->numOfLangs = -1;
+	free(L_Arr);
 }
 
 void FreeLanguage(language_t* L) {
@@ -221,6 +222,11 @@ void FreeLanguage(language_t* L) {
 		}
 		free(L->patterns);
 		L->patterns = NULL;
+	}
+
+	if (L->name != NULL) {
+		free(L->name);
+		L->name = NULL;
 	}
 
 	if (L->singleline_comment_start != NULL) {

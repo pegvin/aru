@@ -49,6 +49,7 @@ pattern_t* LoadPattern(const char* regexStr, const char* colorStr) {
 void FreePattern(pattern_t* p) {
 	if (p != NULL) {
 		tre_regfree(p->regex);
+		free(p->regex);
 		p->regex = NULL;
 		p->color = 0;
 		free(p);

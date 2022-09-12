@@ -55,6 +55,7 @@
 editor_t E; // Holds Configuration & Stuff About Editor
 theme_t* EdTheme = NULL;
 language_arr_t* L_Arr = NULL;
+FILE* LogFilePtr = NULL;
 
 void die(const char *s) {
 	write(STDOUT_FILENO, "\x1b[2J", 4);
@@ -1020,12 +1021,15 @@ void FreeEverything(void) {
 
 	EdTheme = NULL;
 	L_Arr = NULL;
+
+	if (LogFilePtr != NULL) fclose(LogFilePtr);
+	LogFilePtr = NULL;
 }
 
 int main(int argc, char *argv[]) {
 	atexit(FreeEverything);
 
-	FILE* LogFilePtr = fopen("aru.log", "w");
+	LogFilePtr = fopen("aru.log", "w");
 	log_add_fp(LogFilePtr, LOG_TRACE);
 
 	L_Arr = LoadAllLanguages();
@@ -1041,7 +1045,5 @@ int main(int argc, char *argv[]) {
 		editorRefreshScreen();
 		editorProcessKeypress();
 	}
-	fclose(LogFilePtr);
-	LogFilePtr = NULL;
 	return 0;
 }
