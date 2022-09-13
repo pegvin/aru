@@ -3,6 +3,7 @@
 
 #include <termios.h>
 #include <time.h>
+#include "theme.h"
 
 // Defines
 
@@ -69,6 +70,7 @@ typedef struct {
 	char *filename;
 	char statusmsg[80];
 	time_t statusmsg_time;
+	theme_t* theme;
 	struct editorSyntax *syntax;
 	struct termios orig_termios;
 } editor_t;

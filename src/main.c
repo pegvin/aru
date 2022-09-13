@@ -45,7 +45,6 @@
 #include <unistd.h>
 
 #include "main.h"
-#include "theme.h"
 #include "colors.h"
 #include "assets.h"
 #include "helpers.h"
@@ -53,7 +52,6 @@
 #include "log/log.h"
 
 editor_t E; // Holds Configuration & Stuff About Editor
-theme_t* EdTheme = NULL;
 language_arr_t* L_Arr = NULL;
 FILE* LogFilePtr = NULL;
 
@@ -323,14 +321,14 @@ void editorUpdateSyntax(erow *row) {
 
 int editorGetColorForSyntax(int hl) {
 	switch (hl) {
-		case HL_COMMENT:   return EdTheme->COMMENT;
-		case HL_MLCOMMENT: return EdTheme->MLCOMMENT;
-		case HL_KEYWORD1:  return EdTheme->KEYWORD1;
-		case HL_KEYWORD2:  return EdTheme->KEYWORD2;
-		case HL_STRING:    return EdTheme->STRING;
-		case HL_NUMBER:    return EdTheme->NUMBER;
-		case HL_MATCH:     return EdTheme->MATCH;
-		default:           return EdTheme->DEFAULT;
+		case HL_COMMENT:   return E.theme->COMMENT;
+		case HL_MLCOMMENT: return E.theme->MLCOMMENT;
+		case HL_KEYWORD1:  return E.theme->KEYWORD1;
+		case HL_KEYWORD2:  return E.theme->KEYWORD2;
+		case HL_STRING:    return E.theme->STRING;
+		case HL_NUMBER:    return E.theme->NUMBER;
+		case HL_MATCH:     return E.theme->MATCH;
+		default:           return E.theme->DEFAULT;
 	}
 }
 
@@ -1010,16 +1008,17 @@ void initEditor() {
 	E.statusmsg[0] = '\0';
 	E.statusmsg_time = 0;
 	E.syntax = NULL;
+	E.theme = ThemeLoadFrom(AssetsGet("data/themes/dark.json", NULL));
 
 	if (getWindowSize(&E.screenrows, &E.screencols) == -1) die("getWindowSize");
 	E.screenrows -= 2;
 }
 
 void FreeEverything(void) {
-	if (EdTheme != NULL) FreeTheme(EdTheme);
+	if (E.theme != NULL) FreeTheme(E.theme);
 	if (L_Arr != NULL) FreeLanguageArr(L_Arr);
 
-	EdTheme = NULL;
+	E.theme = NULL;
 	L_Arr = NULL;
 
 	if (LogFilePtr != NULL) fclose(LogFilePtr);
@@ -1033,7 +1032,6 @@ int main(int argc, char *argv[]) {
 	log_add_fp(LogFilePtr, LOG_TRACE);
 
 	L_Arr = LoadAllLanguages();
-	EdTheme = ThemeLoadFrom(AssetsGet("data/themes/dark.json", NULL));
 	enableRawMode();
 	initEditor();
 	if (argc >= 2) editorOpen(argv[1]);
