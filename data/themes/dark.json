@@ -1,13 +1,13 @@
 {
 	"name": "Dark",
 	"colors": {
-		"comment": "FG_CYAN",
-		"mlcomment": "FG_CYAN",
-		"keyword1": "FG_YELLOW",
-		"keyword2": "FG_GREEN",
-		"string": "FG_MAGENTA",
-		"number": "FG_RED",
-		"match": "FG_BLUE",
-		"default": "FG_WHITE"
+		"comment": 73,
+		"mlcomment": 73,
+		"keyword1": 197,
+		"keyword2": 76,
+		"string": 220,
+		"number": 198,
+		"match": 33,
+		"default": 15
 	}
 }

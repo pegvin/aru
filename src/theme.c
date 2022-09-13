@@ -7,60 +7,7 @@
 #include "colors.h"
 #include "helpers.h"
 
-#if IS_DEBUG
-void printColor(int color) {
-	switch (color) {
-		case FG_BLACK:
-			printf("FG_BLACK\n");
-			break;
-		case FG_RED:
-			printf("FG_RED\n");
-			break;
-		case FG_GREEN:
-			printf("FG_GREEN\n");
-			break;
-		case FG_YELLOW:
-			printf("FG_YELLOW\n");
-			break;
-		case FG_BLUE:
-			printf("FG_BLUE\n");
-			break;
-		case FG_MAGENTA:
-			printf("FG_MAGENTA\n");
-			break;
-		case FG_CYAN:
-			printf("FG_CYAN\n");
-			break;
-		case FG_WHITE:
-			printf("FG_WHITE\n");
-			break;
-		default:
-			printf("Unknown Color %d\n", color);
-			break;
-	}
-}
-
-void printTheme(theme_t* t) {
-	printf("DEFAULT - ");
-	printColor(t->DEFAULT);
-	printf("COMMENT - ");
-	printColor(t->COMMENT);
-	printf("MLCOMMENT - ");
-	printColor(t->MLCOMMENT);
-	printf("KEYWORD1 - ");
-	printColor(t->KEYWORD1);
-	printf("KEYWORD2 - ");
-	printColor(t->KEYWORD2);
-	printf("STRING - ");
-	printColor(t->STRING);
-	printf("NUMBER - ");
-	printColor(t->NUMBER);
-	printf("MATCH - ");
-	printColor(t->MATCH);
-}
-#endif // IS_DEBUG
-
-void _set_color(char* name, char* value, theme_t* t) {
+void _set_color(char* name, int value, theme_t* t) {
 	int* color = NULL;
 
 	if (strncmp(name, "comment", 7) == 0) {
@@ -83,30 +30,7 @@ void _set_color(char* name, char* value, theme_t* t) {
 		color = &t->DEFAULT;
 	}
 
-	if (value == NULL) {
-		(*color) = FG_WHITE;
-		return;
-	}
-
-	if (strncmp(value, "fg_black", 8) == 0) {
-		(*color) = FG_BLACK;
-	} else if (strncmp(value, "fg_red", 6) == 0) {
-		(*color) = FG_RED;
-	} else if (strncmp(value, "fg_green", 8) == 0) {
-		(*color) = FG_GREEN;
-	} else if (strncmp(value, "fg_yellow", 9) == 0) {
-		(*color) = FG_YELLOW;
-	} else if (strncmp(value, "fg_blue", 7) == 0) {
-		(*color) = FG_BLUE;
-	} else if (strncmp(value, "fg_magenta", 10) == 0) {
-		(*color) = FG_MAGENTA;
-	} else if (strncmp(value, "fg_cyan", 7) == 0) {
-		(*color) = FG_CYAN;
-	} else if (strncmp(value, "fg_white", 8) == 0) {
-		(*color) = FG_WHITE;
-	} else {
-		(*color) = FG_WHITE;
-	}
+	(*color) = value;
 }
 
 theme_t* ThemeLoadFrom(const char* jsonText) {
@@ -143,18 +67,16 @@ theme_t* ThemeLoadFrom(const char* jsonText) {
 	json_object_object_foreach(_colors, key, val) {
 		type = json_object_get_type(val);
 		switch (type) {
-			case json_type_string: {
-				char* parsedVal = (char*)json_object_get_string(val);
+			case json_type_int: {
+				int parsedVal = json_object_get_int(val);
 				strLower(key, strlen(key));
-				strLower(parsedVal, strlen(parsedVal));
-				// printf("_set_color(\"%s\", \"%s\", %p);\n", key, parsedVal, (void*)t);
 				_set_color(key, parsedVal, t);
 				break;
 			}
+			case json_type_string:
 			case json_type_null:
 			case json_type_boolean:
 			case json_type_double:
-			case json_type_int:
 			case json_type_object:
 			case json_type_array:
 				break;

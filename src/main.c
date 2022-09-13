@@ -321,7 +321,7 @@ void editorUpdateSyntax(erow *row) {
 		editorUpdateSyntax(&E.row[row->idx + 1]);
 }
 
-int editorSyntaxToColor(int hl) {
+int editorGetColorForSyntax(int hl) {
 	switch (hl) {
 		case HL_COMMENT:   return EdTheme->COMMENT;
 		case HL_MLCOMMENT: return EdTheme->MLCOMMENT;
@@ -755,17 +755,17 @@ void editorDrawRows(struct abuf *ab) {
 					}
 					abAppend(ab, &c[j], 1);
 				} else {
-					int color = editorSyntaxToColor(hl[j]);
+					int color = editorGetColorForSyntax(hl[j]);
 					if (color != current_color) {
 						current_color = color;
 						char buf[16];
-						int clen = snprintf(buf, sizeof(buf), "\x1b[%dm", color);
+						int clen = snprintf(buf, sizeof(buf), "\x1b[38;5;%dm", color);
 						abAppend(ab, buf, clen);
 					}
 					abAppend(ab, &c[j], 1);
 				}
 			}
-			abAppend(ab, "\x1b[39m", 5);
+			abAppend(ab, "\x1b[39m", 5); // Reset Foreground Color To Default
 		}
 
 		abAppend(ab, "\x1b[K", 3);
