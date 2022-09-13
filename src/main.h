@@ -1,9 +1,7 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#include <termios.h>
-#include <time.h>
-#include "theme.h"
+#include "terminal.h"
 
 // Defines
 
@@ -22,20 +20,6 @@
 
 #define CTRL_KEY(k) ((k) & 0x1f)
 
-// Structs & Enums
-typedef enum {
-	BACKSPACE = 127,
-	ARROW_LEFT = 1000,
-	ARROW_RIGHT,
-	ARROW_UP,
-	ARROW_DOWN,
-	DEL_KEY,
-	HOME_KEY,
-	END_KEY,
-	PAGE_UP,
-	PAGE_DOWN
-} editor_key_t;
-
 typedef enum {
 	HL_NORMAL = 0,
 	HL_COMMENT,
@@ -47,34 +31,7 @@ typedef enum {
 	HL_MATCH
 } syntax_color_t;
 
-typedef struct {
-	int idx;
-	int size;
-	int rsize;
-	char *chars;
-	char *render;
-	unsigned char *hl;
-	int hl_open_comment;
-} erow;
-
-typedef struct {
-	int cx, cy;
-	int rx;
-	int rowoff;
-	int coloff;
-	int screenrows;
-	int screencols;
-	int numrows;
-	erow *row;
-	int dirty;
-	char *filename;
-	char statusmsg[80];
-	time_t statusmsg_time;
-	theme_t* theme;
-	struct editorSyntax *syntax;
-	struct termios orig_termios;
-} editor_t;
-
+void die(const char *s);
 void editorSetStatusMessage(const char *fmt, ...);
 void editorRefreshScreen();
 char *editorPrompt(char *prompt, void (*callback)(char *, int));
