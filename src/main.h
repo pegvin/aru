@@ -32,8 +32,8 @@ typedef enum {
 } syntax_color_t;
 
 void die(const char *s);
-void editorSetStatusMessage(const char *fmt, ...);
-void editorRefreshScreen();
-char *editorPrompt(char *prompt, void (*callback)(char *, int));
+void EditorSetStatusMessage(const char *fmt, ...);
+void EditorRefreshScreen();
+char* EditorPromptText(char *prompt, void (*callback)(char *, int));
 
 #endif
