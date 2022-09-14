@@ -2,6 +2,7 @@
 #define EDITOR_H 1
 
 #include "theme.h"
+#include "language.h"
 
 typedef struct {
 	int idx;
@@ -27,7 +28,7 @@ typedef struct {
 	char statusmsg[80];
 	time_t statusmsg_time;
 	theme_t* theme;
-	struct editorSyntax* syntax;
+	language_t* syntax;
 } editor_t;
 
 #endif
