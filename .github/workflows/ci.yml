@@ -29,23 +29,12 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Install Git, Scons, cmake & libtre
+    - name: Install Git, Scons, Ncurses
       run: |
-        sudo apt-get install git scons cmake libtre-dev libtre5
-
-    - name: Build & Install json-c
-      run: | # XX - Build Static Library & Use That Instead
-        cd ..
-        git clone https://github.com/json-c/json-c -b json-c-0.16-20220414 json-c
-        cd json-c
-        mkdir build
-        cd build
-        cmake -DBUILD_SHARED_LIBS=On -DCMAKE_BUILD_TYPE=Release ..
-        make
-        sudo make install
+        sudo apt-get install git scons libncurses-dev
 
     - name: Build
-      run: make gen-assets release
+      run: make release
 
     - name: Strip
       run: strip ./aru
@@ -64,33 +53,12 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Install scons, cmake & libtre
+    - name: Install scons & ncurses
       run: |
-        brew install scons cmake tre autoconf automake libtool gettext
-
-    - name: Build & Install json-c
-      run: | # XX - Build Static Library & Use That Instead
-        cd ..
-        git clone https://github.com/json-c/json-c -b json-c-0.16-20220414 json-c
-        cd json-c
-        mkdir build
-        cd build
-        cmake -DBUILD_SHARED_LIBS=On -DCMAKE_BUILD_TYPE=Release ..
-        make
-        sudo make install
-
-    - name: Build and install libtre
-      run: |
-        cd ..
-        git clone https://github.com/laurikari/tre --recursive
-        cd tre
-        ./utils/autogen.sh
-        ./configure
-        make
-        sudo make install
+        sudo brew install scons ncurses
 
     - name: Build
-      run: make gen-assets release
+      run: make release
 
     - name: Strip
       run: strip ./aru
