@@ -28,7 +28,7 @@ typedef struct {
 	char statusmsg[80];
 	time_t statusmsg_time;
 	theme_t* theme;
-	language_t* syntax;
+	struct editorSyntax* syntax;
 } editor_t;
 
 #endif
