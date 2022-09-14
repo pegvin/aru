@@ -1,6 +1,8 @@
 #ifndef HELPERS_H
 #define HELPERS_H 1
 
+#include <stdbool.h>
+
 bool str_startswith(const char *prefix, const char *str);
 char* _strdup(const char *str);
 void strLower(char* str, int len);
