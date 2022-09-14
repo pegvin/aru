@@ -383,7 +383,7 @@ static inline void EditorInsertNewLine() {
 	E.cx = 0;
 }
 
-void editorDelChar() {
+void EditorDeleteChar() {
 	if (E.cy == E.numrows) return;
 	if (E.cx == 0 && E.cy == 0) return;
 
@@ -840,7 +840,7 @@ static inline void EditorProcessKeys() {
 		case CTRL_KEY('h'):
 		case DEL_KEY:
 			if (c == DEL_KEY) EditorMoveCursor(ARROW_RIGHT);
-			editorDelChar();
+			EditorDeleteChar();
 			break;
 
 		case PAGE_UP:
