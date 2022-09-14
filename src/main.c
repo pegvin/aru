@@ -32,6 +32,7 @@
 #define _GNU_SOURCE
 
 #include "main.h"
+#include "abuf.h"
 #include "colors.h"
 #include "assets.h"
 #include "helpers.h"
@@ -548,28 +549,6 @@ void EditorSearchText() {
 	}
 }
 
-/*** append buffer ***/
-
-struct abuf {
-	char *b;
-	int len;
-};
-
-#define ABUF_INIT {NULL, 0}
-
-void abAppend(struct abuf *ab, const char *s, int len) {
-	char *new = realloc(ab->b, ab->len + len);
-
-	if (new == NULL) return;
-	memcpy(&new[ab->len], s, len);
-	ab->b = new;
-	ab->len += len;
-}
-
-void abFree(struct abuf *ab) {
-	free(ab->b);
-}
-
 /*** output ***/
 
 void EditorScroll() {
@@ -592,7 +571,7 @@ void EditorScroll() {
 	}
 }
 
-static inline void EditorDrawRows(struct abuf *ab) {
+static inline void EditorDrawRows(abuf_t *ab) {
 	int y;
 	for (y = 0; y < E.screenrows; y++) {
 		int filerow = y + E.rowoff;
@@ -656,7 +635,7 @@ static inline void EditorDrawRows(struct abuf *ab) {
 	}
 }
 
-static inline void EditorDrawStatusbar(struct abuf *ab) {
+static inline void EditorDrawStatusbar(abuf_t *ab) {
 	abAppend(ab, "\x1b[7m", 4);
 	char status[80], rstatus[80];
 	int len = snprintf(status, sizeof(status), "%.20s - %d lines %s",
@@ -679,7 +658,7 @@ static inline void EditorDrawStatusbar(struct abuf *ab) {
 	abAppend(ab, "\r\n", 2);
 }
 
-static inline void EditorDrawMessagebar(struct abuf *ab) {
+static inline void EditorDrawMessagebar(abuf_t *ab) {
 	abAppend(ab, "\x1b[K", 3);
 	int msglen = strlen(E.statusmsg);
 	if (msglen > E.screencols) msglen = E.screencols;
@@ -690,7 +669,7 @@ static inline void EditorDrawMessagebar(struct abuf *ab) {
 void EditorRefreshScreen() {
 	EditorScroll();
 
-	struct abuf ab = ABUF_INIT;
+	abuf_t ab = ABUF_INIT;
 
 	abAppend(&ab, "\x1b[?25l", 6);
 	abAppend(&ab, "\x1b[H", 3);
@@ -700,13 +679,12 @@ void EditorRefreshScreen() {
 	EditorDrawMessagebar(&ab);
 
 	char buf[32];
-	snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 1,
-																						(E.rx - E.coloff) + 1);
-	abAppend(&ab, buf, strlen(buf));
+	snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 1, (E.rx - E.coloff) + 1);
 
+	abAppend(&ab, buf, strlen(buf));
 	abAppend(&ab, "\x1b[?25h", 6);
 
-	write(STDOUT_FILENO, ab.b, ab.len);
+	write(STDOUT_FILENO, ab.buffer, ab.len);
 	abFree(&ab);
 }
 
