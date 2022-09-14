@@ -113,7 +113,7 @@ if target_os != 'msys':
 	)
 
 env.Append(
-	LIBS=['m', 'json-c', 'tre'],
+	LIBS=['ncurses'],
 	CCFLAGS=['-DLOG_USE_COLOR']
 )
 
