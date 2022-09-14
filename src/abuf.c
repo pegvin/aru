@@ -2,8 +2,8 @@
 #include <string.h>
 #include "abuf.h"
 
-void abAppend(abuf_t *ab, const char *s, int len) {
-	char *new = realloc(ab->buffer, ab->len + len);
+void abAppend(abuf_t* ab, const char* s, int len) {
+	char* new = realloc(ab->buffer, ab->len + len);
 
 	if (new == NULL) return;
 	memcpy(&new[ab->len], s, len);
@@ -11,6 +11,6 @@ void abAppend(abuf_t *ab, const char *s, int len) {
 	ab->len += len;
 }
 
-void abFree(abuf_t *ab) {
+void abFree(abuf_t* ab) {
 	free(ab->buffer);
 }
