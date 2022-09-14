@@ -1,5 +1,5 @@
 #include "assets.h"
-#inckude "helpers.h"
+#include "helpers.h"
 #include <stdio.h>
 
 typedef struct {
