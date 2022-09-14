@@ -6,6 +6,10 @@
 
 #include "helpers.h"
 
+bool str_startswith(const char *prefix, const char *str) {
+	return strncmp(prefix, str, strlen(prefix)) == 0;
+}
+
 char* _strdup(const char *str) {
 	if (str == NULL) return NULL;
 
