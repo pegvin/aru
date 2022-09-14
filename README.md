@@ -8,6 +8,8 @@ a text editor
 - [x] Simple Text Editing
 - [x] Syntax Highlighting
 - [x] Opening, Closing & Saving Files
+- [ ] Add Lua Support
+- [ ] Use Lua Support For Syntax And Stuff
 - [ ] Windows Support (Unsure)
 - [ ] Try [pcre2](https://github.com/PCRE2Project/pcre2) for "advanced" regex
 - [ ] Undo-Redo
