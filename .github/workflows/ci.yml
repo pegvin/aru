@@ -55,7 +55,7 @@ jobs:
 
     - name: Install scons & ncurses
       run: |
-        sudo brew install scons ncurses
+        brew install scons ncurses
 
     - name: Build
       run: make release
