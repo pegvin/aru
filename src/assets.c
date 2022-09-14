@@ -12,10 +12,6 @@ static asset_t ASSETS[] = {
 	#include "assets/themes.inl"
 };
 
-bool str_startswith(const char *prefix, const char *str) {
-	return strncmp(prefix, str, strlen(prefix)) == 0;
-}
-
 const void* AssetsGet(const char *filePath, int *size) {
 	int i;
 	if (str_startswith("asset://", filePath) == true) filePath += 8; // Skip asset://
