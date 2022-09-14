@@ -9,7 +9,7 @@
 #define HL_HIGHLIGHT_NUMBERS (1<<0)
 #define HL_HIGHLIGHT_STRINGS (1<<1)
 
-struct editorSyntax {
+typedef struct editorSyntax {
 	char*      name;             // Language Name
 	char**     extensions;       // Array Of File Extensions Like .c, .h, .cpp
 	int        totalExtensions;  // Total Elements in "extensions"
@@ -24,9 +24,7 @@ struct editorSyntax {
 	char*      multiline_comment_start;  // Multi-Line Comment Start Like "/*"
 	char*      multiline_comment_end;    // Multi-Line Comment Start Like "*/"
 	int        flags;                    // Flags For The Highlighter Like "HL_HIGHLIGHT_STRINGS" enables highlighting string
-};
-
-typedef struct editorSyntax language_t;
+} language_t;
 
 typedef struct {
 	language_t** languages;
