@@ -9,7 +9,7 @@
 #define HL_HIGHLIGHT_NUMBERS (1<<0)
 #define HL_HIGHLIGHT_STRINGS (1<<1)
 
-typedef struct {
+typedef struct editorSyntax {
 	char*      name;             // Language Name
 	char**     extensions;       // Array Of File Extensions Like .c, .h, .cpp
 	int        totalExtensions;  // Total Elements in "extensions"
