@@ -4,7 +4,6 @@
 #include "language.h"
 #include "log/log.h"
 #include "assets.h"
-#include "pattern.h"
 #include "helpers.h"
 
 #if IS_DEBUG
