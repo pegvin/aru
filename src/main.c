@@ -1,5 +1,5 @@
 /* BSD 2-Clause License
- * 
+ *
  * Copyright (c) 2022, Aditya Mishra
  * All rights reserved.
  *
@@ -227,15 +227,15 @@ static inline int EditorGetColorFromSyntax(int hl) {
 
 void EditorSelectSyntax() {
 	E.syntax = NULL;
-	if (E.filename == NULL) return;
+	if (E.filePath == NULL) return;
 
-	char* ext = strrchr(E.filename, '.');
+	char* ext = strrchr(E.filePath, '.');
 
 	for (unsigned int j = 0; j < L_Arr->numOfLangs; j++) {
 		language_t* s = L_Arr->languages[j];
 		for (int i = 0; i < s->totalExtensions; ++i) {
 			int is_ext = (s->extensions[i][0] == '.');
-			if ((is_ext && ext && !strcmp(ext, s->extensions[i])) || (!is_ext && strstr(E.filename, s->extensions[i]))) {
+			if ((is_ext && ext && !strcmp(ext, s->extensions[i])) || (!is_ext && strstr(E.filePath, s->extensions[i]))) {
 				E.syntax = s;
 
 				int filerow;
@@ -413,6 +413,7 @@ char *EditorRowsToStr(int *buflen) {
 	int j;
 	for (j = 0; j < E.numrows; j++)
 		totlen += E.row[j].size + 1;
+
 	*buflen = totlen;
 
 	char *buf = malloc(totlen);
@@ -427,14 +428,15 @@ char *EditorRowsToStr(int *buflen) {
 	return buf;
 }
 
-void EditorOpenDoc(char *filename) {
-	if (E.filename != NULL)
-		free(E.filename);
+void EditorOpenDoc(char *filePath) {
+	if (E.filePath != NULL)
+		free(E.filePath);
 
-	E.filename = _strdup(filename);
+	E.filePath = _strdup(filePath);
+	E.fileName = basename(filePath);
 	EditorSelectSyntax();
 
-	FILE *fp = fopen(filename, "r+");
+	FILE *fp = fopen(filePath, "r+");
 	if (!fp) die("fopen");
 
 	char *line = NULL;
@@ -454,9 +456,9 @@ void EditorOpenDoc(char *filename) {
 }
 
 void EditorSaveDoc() {
-	if (E.filename == NULL) {
-		E.filename = EditorPromptText("Save as: %s (ESC to cancel)", NULL);
-		if (E.filename == NULL) {
+	if (E.filePath == NULL) {
+		E.filePath = EditorPromptText("Save as: %s (ESC to cancel)", NULL);
+		if (E.filePath == NULL) {
 			EditorSetStatusMessage("Save aborted");
 			return;
 		}
@@ -466,7 +468,7 @@ void EditorSaveDoc() {
 	int len;
 	char *buf = EditorRowsToStr(&len);
 
-	int fd = open(E.filename, O_RDWR | O_CREAT, 0644);
+	int fd = open(E.filePath, O_RDWR | O_CREAT, 0644);
 	if (fd != -1) {
 		if (ftruncate(fd, len) != -1) {
 			if (write(fd, buf, len) == len) {
@@ -578,7 +580,7 @@ void EditorScroll() {
 }
 
 static inline void EditorDrawRows(abuf_t *ab) {
-	int y;
+	int y = 0;
 	for (y = 0; y < E.screenrows; y++) {
 		int filerow = y + E.rowoff;
 		if (filerow >= E.numrows) {
@@ -610,7 +612,7 @@ static inline void EditorDrawRows(abuf_t *ab) {
 					char sym = (c[j] <= 26) ? '@' + c[j] : '?';
 					abAppend(ab, "\x1b[7m", 4); // Set inverse/reverse video mode
 					abAppend(ab, &sym, 1);
-					abAppend(ab, "\x1b[m", 3);
+					abAppend(ab, "\x1b[m", 3);  // Go back to normal text formatting.
 					if (current_color != -1) {
 						char buf[16];
 						int clen = snprintf(buf, sizeof(buf), "\x1b[%dm", current_color);
@@ -644,11 +646,12 @@ static inline void EditorDrawRows(abuf_t *ab) {
 static inline void EditorDrawStatusbar(abuf_t *ab) {
 	abAppend(ab, "\x1b[7m", 4); // set inverse/reverse video mode
 	char status[80], rstatus[80];
-	int len = snprintf(status, sizeof(status), "%.20s - %d lines %s",
-		E.filename ? E.filename : "[No Name]", E.numrows,
-		E.dirty ? "(modified)" : "");
-	int rlen = snprintf(rstatus, sizeof(rstatus), "%s | %d/%d",
-		E.syntax ? E.syntax->name : "no ft", E.cy + 1, E.numrows);
+	int len = snprintf(status, sizeof(status), " "
+		// "%.20s - %d lines %s",
+		// E.filePath ? E.filePath : "[No Name]", E.numrows,
+		// E.dirty ? "(modified)" : ""
+	);
+	int rlen = snprintf(rstatus, sizeof(rstatus), "%s | %d/%d", E.syntax ? E.syntax->name : "no ft", E.cy + 1, E.numrows);
 	if (len > E.screencols) len = E.screencols;
 	abAppend(ab, status, len);
 	while (len < E.screencols) {
@@ -660,7 +663,32 @@ static inline void EditorDrawStatusbar(abuf_t *ab) {
 			len++;
 		}
 	}
-	abAppend(ab, "\x1b[m", 3);
+	abAppend(ab, "\x1b[m", 3); // Go back to normal text formatting.
+	abAppend(ab, "\r\n", 2);
+}
+
+static inline void EditorDrawHeaderbar(abuf_t *ab) {
+	abAppend(ab, "\x1b[K", 3); // erase in line (same as ESC[0K)
+	abAppend(ab, "\x1b[1;31m", 7); // Set Text To Bold
+	abAppend(ab, "\x1b[38;5;12m", 10); // Text Color
+	abAppend(ab, "\x1b[48;5;237m", 11); // Background Color
+	char header[80], rheader[80];
+	int len = snprintf(header, sizeof(header), " %s", E.fileName ? E.fileName : "[New Buffer]");
+	int rlen = snprintf(rheader, sizeof(rheader), "%s", E.dirty ? "(Modified) " : "");
+	if (len > E.screencols) len = E.screencols;
+	abAppend(ab, header, len);
+	while (len < E.screencols) {
+		if (E.screencols - len == rlen) {
+			abAppend(ab, rheader, rlen);
+			break;
+		} else {
+			abAppend(ab, " ", 1);
+			len++;
+		}
+	}
+	abAppend(ab, "\x1b[39m", 5); // Reset Foreground Color To Default
+	abAppend(ab, "\x1b[49m", 5); // Reset Foreground Color To Default
+	abAppend(ab, "\x1b[m", 3); // Go back to normal text formatting.
 	abAppend(ab, "\r\n", 2);
 }
 
@@ -680,12 +708,13 @@ void EditorRefreshScreen() {
 	abAppend(&ab, "\x1b[?25l", 6); // make cursor invisible
 	abAppend(&ab, "\x1b[H", 3);    // move cursor to home position (0, 0)
 
+	EditorDrawHeaderbar(&ab);
 	EditorDrawRows(&ab);
 	EditorDrawStatusbar(&ab);
 	EditorDrawMessagebar(&ab);
 
 	char buf[32];
-	snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 1, (E.rx - E.coloff) + 1);
+	snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 1 + 1 /* Extra +1 to offset the cursor because of header */, (E.rx - E.coloff) + 1);
 
 	abAppend(&ab, buf, strlen(buf));
 	abAppend(&ab, "\x1b[?25h", 6); // make cursor visible
@@ -871,14 +900,15 @@ static inline void EditorInit() {
 	E.numrows = 0;
 	E.row = NULL;
 	E.dirty = 0;
-	E.filename = NULL;
+	E.filePath = NULL;
+	E.fileName = NULL;
 	E.statusmsg[0] = '\0';
 	E.statusmsg_time = 0;
 	E.syntax = NULL;
 	E.theme = ThemeLoadFrom(AssetsGet("data/themes/dark.json", NULL));
 
 	if (TermGetWinSize(&E.screenrows, &E.screencols) == -1) die("getWindowSize");
-	E.screenrows -= 2;
+	E.screenrows -= 3;
 }
 
 void FreeEverything(void) {

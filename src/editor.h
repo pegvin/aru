@@ -24,7 +24,8 @@ typedef struct {
 	int numrows;
 	erow* row;
 	int dirty;
-	char* filename;
+	char* filePath;
+	char* fileName;
 	char statusmsg[80];
 	time_t statusmsg_time;
 	theme_t* theme;
