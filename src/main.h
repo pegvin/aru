@@ -20,17 +20,6 @@
 
 #define CTRL_KEY(k) ((k) & 0x1f)
 
-typedef enum {
-	HL_NORMAL = 0,
-	HL_COMMENT,
-	HL_MLCOMMENT,
-	HL_KEYWORD1,
-	HL_KEYWORD2,
-	HL_STRING,
-	HL_NUMBER,
-	HL_MATCH
-} syntax_color_t;
-
 void die(const char *s);
 void EditorSetStatusMessage(const char *fmt, ...);
 void EditorRefreshScreen();

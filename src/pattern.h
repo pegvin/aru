@@ -2,7 +2,7 @@
 #define PATTERN_H
 
 #include <tre/tre.h>
-#include "main.h"
+#include "colors.h"
 
 typedef struct {
 	regex_t* regex;
