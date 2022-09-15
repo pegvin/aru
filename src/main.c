@@ -781,11 +781,11 @@ static inline void EditorProcessKeys() {
 	int c = TermReadKey();
 
 	switch (c) {
-		case '\r':
+		case '\r': {
 			EditorInsertNewLine();
 			break;
-
-		case CTRL_KEY('q'):
+		}
+		case CTRL_KEY('q'): {
 			if (E.dirty && quit_times > 0) {
 				EditorSetStatusMessage("WARNING!!! File has unsaved changes. "
 					"Press Ctrl-Q %d more times to quit.", quit_times);
@@ -796,34 +796,33 @@ static inline void EditorProcessKeys() {
 			write(STDOUT_FILENO, "\x1b[H", 3);
 			exit(0);
 			break;
-
-		case CTRL_KEY('s'):
+		}
+		case CTRL_KEY('s'): {
 			EditorSaveDoc();
 			break;
-
-		case HOME_KEY:
+		}
+		case HOME_KEY: {
 			E.cx = 0;
 			break;
-
-		case END_KEY:
+		}
+		case END_KEY: {
 			if (E.cy < E.numrows)
 				E.cx = E.row[E.cy].size;
 			break;
-
-		case CTRL_KEY('f'):
+		}
+		case CTRL_KEY('f'): {
 			EditorSearchText();
 			break;
-
+		}
 		case BACKSPACE:
 		case CTRL_KEY('h'):
-		case DEL_KEY:
+		case DEL_KEY: {
 			if (c == DEL_KEY) EditorMoveCursor(ARROW_RIGHT);
 			EditorDeleteChar();
 			break;
-
+		}
 		case PAGE_UP:
-		case PAGE_DOWN:
-			{
+		case PAGE_DOWN: {
 				if (c == PAGE_UP) {
 					E.cy = E.rowoff;
 				} else if (c == PAGE_DOWN) {
@@ -834,23 +833,22 @@ static inline void EditorProcessKeys() {
 				int times = E.screenrows;
 				while (times--)
 					EditorMoveCursor(c == PAGE_UP ? ARROW_UP : ARROW_DOWN);
-			}
 			break;
-
+		}
 		case ARROW_UP:
 		case ARROW_DOWN:
 		case ARROW_LEFT:
-		case ARROW_RIGHT:
+		case ARROW_RIGHT: {
 			EditorMoveCursor(c);
 			break;
-
+		}
 		case CTRL_KEY('l'):
 		case '\x1b':
 			break;
-
-		default:
+		default: {
 			EditorInsertChar(c);
 			break;
+		}
 	}
 
 	quit_times = ARU_QUIT_TIMES;
@@ -901,8 +899,7 @@ int main(int argc, char *argv[]) {
 	EditorInit();
 	if (argc >= 2) EditorOpenDoc(argv[1]);
 
-	EditorSetStatusMessage(
-		"HELP: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F = find");
+	EditorSetStatusMessage("HELP: Ctrl-S = save | Ctrl-Q = quit | Ctrl-F = find");
 
 	while (1) {
 		EditorRefreshScreen();
