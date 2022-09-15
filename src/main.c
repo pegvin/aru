@@ -40,13 +40,19 @@
 #include "language.h"
 #include "log/log.h"
 
+/*
+	Would be great if you read this:
+	  - https://gist.github.com/fnky/458719343aabd01cfb17a3a4f7296797
+	before seeing the file
+*/
+
 editor_t E; // Holds Configuration & Stuff About Editor
 language_arr_t* L_Arr = NULL;
 FILE* LogFilePtr = NULL;
 
 void die(const char *s) {
-	write(STDOUT_FILENO, "\x1b[2J", 4);
-	write(STDOUT_FILENO, "\x1b[H", 3);
+	write(STDOUT_FILENO, "\x1b[2J", 4); // erase entire screen
+	write(STDOUT_FILENO, "\x1b[H", 3);  // move cursor to home position (0, 0)
 
 	perror(s);
 	exit(1);
@@ -602,7 +608,7 @@ static inline void EditorDrawRows(abuf_t *ab) {
 			for (j = 0; j < len; j++) {
 				if (iscntrl(c[j])) {
 					char sym = (c[j] <= 26) ? '@' + c[j] : '?';
-					abAppend(ab, "\x1b[7m", 4);
+					abAppend(ab, "\x1b[7m", 4); // Set inverse/reverse video mode
 					abAppend(ab, &sym, 1);
 					abAppend(ab, "\x1b[m", 3);
 					if (current_color != -1) {
@@ -612,7 +618,7 @@ static inline void EditorDrawRows(abuf_t *ab) {
 					}
 				} else if (hl[j] == HL_NORMAL) {
 					if (current_color != -1) {
-						abAppend(ab, "\x1b[39m", 5);
+						abAppend(ab, "\x1b[39m", 5); // Set FG Text Color To Default
 						current_color = -1;
 					}
 					abAppend(ab, &c[j], 1);
@@ -621,7 +627,7 @@ static inline void EditorDrawRows(abuf_t *ab) {
 					if (color != current_color) {
 						current_color = color;
 						char buf[16];
-						int clen = snprintf(buf, sizeof(buf), "\x1b[38;5;%dm", color);
+						int clen = snprintf(buf, sizeof(buf), "\x1b[38;5;%dm", color); // Set FG Text Color
 						abAppend(ab, buf, clen);
 					}
 					abAppend(ab, &c[j], 1);
@@ -630,13 +636,13 @@ static inline void EditorDrawRows(abuf_t *ab) {
 			abAppend(ab, "\x1b[39m", 5); // Reset Foreground Color To Default
 		}
 
-		abAppend(ab, "\x1b[K", 3);
+		abAppend(ab, "\x1b[K", 3); // erase in line (same as ESC[0K)
 		abAppend(ab, "\r\n", 2);
 	}
 }
 
 static inline void EditorDrawStatusbar(abuf_t *ab) {
-	abAppend(ab, "\x1b[7m", 4);
+	abAppend(ab, "\x1b[7m", 4); // set inverse/reverse video mode
 	char status[80], rstatus[80];
 	int len = snprintf(status, sizeof(status), "%.20s - %d lines %s",
 		E.filename ? E.filename : "[No Name]", E.numrows,
@@ -659,7 +665,7 @@ static inline void EditorDrawStatusbar(abuf_t *ab) {
 }
 
 static inline void EditorDrawMessagebar(abuf_t *ab) {
-	abAppend(ab, "\x1b[K", 3);
+	abAppend(ab, "\x1b[K", 3); // erase in line (same as ESC[0K)
 	int msglen = strlen(E.statusmsg);
 	if (msglen > E.screencols) msglen = E.screencols;
 	if (msglen && time(NULL) - E.statusmsg_time < 5)
@@ -671,8 +677,8 @@ void EditorRefreshScreen() {
 
 	abuf_t ab = ABUF_INIT;
 
-	abAppend(&ab, "\x1b[?25l", 6);
-	abAppend(&ab, "\x1b[H", 3);
+	abAppend(&ab, "\x1b[?25l", 6); // make cursor invisible
+	abAppend(&ab, "\x1b[H", 3);    // move cursor to home position (0, 0)
 
 	EditorDrawRows(&ab);
 	EditorDrawStatusbar(&ab);
@@ -682,7 +688,7 @@ void EditorRefreshScreen() {
 	snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 1, (E.rx - E.coloff) + 1);
 
 	abAppend(&ab, buf, strlen(buf));
-	abAppend(&ab, "\x1b[?25h", 6);
+	abAppend(&ab, "\x1b[?25h", 6); // make cursor visible
 
 	write(STDOUT_FILENO, ab.buffer, ab.len);
 	abFree(&ab);
@@ -792,8 +798,8 @@ static inline void EditorProcessKeys() {
 				quit_times--;
 				return;
 			}
-			write(STDOUT_FILENO, "\x1b[2J", 4);
-			write(STDOUT_FILENO, "\x1b[H", 3);
+			write(STDOUT_FILENO, "\x1b[2J", 4); // erase entire screen
+			write(STDOUT_FILENO, "\x1b[H", 3);  // move cursor to home position (0, 0)
 			exit(0);
 			break;
 		}
