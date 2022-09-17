@@ -922,6 +922,7 @@ void FreeEverything(void) {
 
 	if (LogFilePtr != NULL) fclose(LogFilePtr);
 	LogFilePtr = NULL;
+	TermSwitchToMainScreen();
 }
 
 int main(int argc, char *argv[]) {
@@ -931,6 +932,7 @@ int main(int argc, char *argv[]) {
 	log_add_fp(LogFilePtr, LOG_TRACE);
 
 	L_Arr = LoadAllLanguages();
+	TermSwitchToAlternativeScreen();
 	TermEnableRawMode();
 	EditorInit();
 	if (argc >= 2) EditorOpenDoc(argv[1]);

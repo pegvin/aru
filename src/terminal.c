@@ -1,9 +1,24 @@
 #include "terminal.h"
+#include "log/log.h"
 
 struct termios OriginalTermIOS;
 
 // in main.c
 void die(const char *s);
+
+void TermSwitchToAlternativeScreen() {
+	int result = write(STDOUT_FILENO, "\x1b[?1049h", 8);
+	if (result != 8) {
+		log_error("cannot write 8 bytes to STDOUT_FILENO!");
+	}
+}
+
+void TermSwitchToMainScreen() {
+	int result = write(STDOUT_FILENO, "\x1b[?1049l", 8);
+	if (result != 8) {
+		log_error("cannot write 8 bytes to STDOUT_FILENO!");
+	}
+}
 
 // Uses Simple Escape Codes To Get The Cursor Positon
 int TermGetCursorPos(int *rows, int *cols) {

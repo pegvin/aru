@@ -39,5 +39,7 @@ int TermGetWinSize(int *rows, int *cols);
 void TermEnableRawMode();
 void TermDisableRawMode();
 int TermReadKey();
+void TermSwitchToAlternativeScreen();
+void TermSwitchToMainScreen();
 
 #endif
