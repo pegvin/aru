@@ -1,7 +1,7 @@
 #ifndef LANGUAGE_H
 #define LANGUAGE_H
 
-#include <regex.h>
+#include <tre/tre.h>
 
 #include "main.h"
 #include "pattern.h"

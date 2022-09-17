@@ -159,9 +159,9 @@ void EditorSyntaxHighlightRow(erow *row) {
 			for (j = 0; j < E.syntax->totalPatterns; j++) {
 				pattern_t* p = E.syntax->patterns[j];
 				regmatch_t matches[1];
-				int result = regexec(p->regex, &row->render[i], 1, matches, 0);
+				int result = tre_regexec(p->regex, &row->render[i], 1, matches, 0);
 				int klen = -1;
-				if (result == R_OK) {
+				if (result == REG_OK) {
 					klen = matches[0].rm_eo - matches[0].rm_so;
 					if (klen > 0) {
 						memset((&row->hl[i]) + matches[0].rm_so, p->color, klen);

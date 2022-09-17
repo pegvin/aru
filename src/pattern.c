@@ -1,18 +1,16 @@
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
-
-#include "log/log.h"
 #include "colors.h"
 #include "pattern.h"
 #include "helpers.h"
 
 pattern_t* LoadPattern(const char* regexStr, const char* colorStr) {
 	pattern_t* p = NULL;
+
 	if (regexStr != NULL) {
 		regex_t* r = malloc(sizeof(regex_t));
-		int result = regcomp(r, regexStr, REG_EXTENDED | REG_ICASE);
-		if (result == 0) {
+		int result = tre_regcomp(r, regexStr, REG_EXTENDED);
+		if (result == REG_OK) {
 			p = malloc(sizeof(pattern_t));
 			p->regex = r;
 			if (colorStr != NULL) {
@@ -40,11 +38,7 @@ pattern_t* LoadPattern(const char* regexStr, const char* colorStr) {
 				p->color = HL_NORMAL;
 			}
 		} else {
-			char* errorStr = NULL;
-			size_t errorStrSize = 0;
-
-			log_error("Failed To Compile The Regex: %s", regerror(result, r, errorStr, errorStrSize));
-			regfree(r);
+			tre_regfree(r);
 			r = NULL;
 		}
 	}
@@ -54,7 +48,7 @@ pattern_t* LoadPattern(const char* regexStr, const char* colorStr) {
 
 void FreePattern(pattern_t* p) {
 	if (p != NULL) {
-		regfree(p->regex);
+		tre_regfree(p->regex);
 		free(p->regex);
 		p->regex = NULL;
 		p->color = 0;
