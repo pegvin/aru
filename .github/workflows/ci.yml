@@ -29,9 +29,9 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Install Git, Scons, cmake & libtre
+    - name: Install Git, Scons & cmake
       run: |
-        sudo apt-get install git scons cmake libtre-dev libtre5
+        sudo apt-get install git scons cmake
 
     - name: Build & Install json-c
       run: | # XX - Build Static Library & Use That Instead
@@ -64,9 +64,9 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Install scons, cmake & libtre
+    - name: Install scons & cmake
       run: |
-        brew install scons cmake tre autoconf automake libtool gettext
+        brew install scons cmake autoconf automake libtool gettext
 
     - name: Build & Install json-c
       run: | # XX - Build Static Library & Use That Instead
@@ -76,16 +76,6 @@ jobs:
         mkdir build
         cd build
         cmake -DBUILD_SHARED_LIBS=On -DCMAKE_BUILD_TYPE=Release ..
-        make
-        sudo make install
-
-    - name: Build and install libtre
-      run: |
-        cd ..
-        git clone https://github.com/laurikari/tre --recursive
-        cd tre
-        ./utils/autogen.sh
-        ./configure
         make
         sudo make install
 
