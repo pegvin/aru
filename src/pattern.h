@@ -1,7 +1,7 @@
 #ifndef PATTERN_H
 #define PATTERN_H
 
-#include <tre/tre.h>
+#include <regex.h>
 #include "colors.h"
 
 typedef struct {
