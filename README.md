@@ -10,8 +10,8 @@ a text editor
 |--------------|----------------|
 | Ctrl + O     | Open File      |
 | Ctrl + S     | Save File      |
-| Ctrl + S     | Save File      |
 | Ctrl + F     | Find Text      |
+| Ctrl + Q     | Close Editor   |
 | Backspace    | Remove Text in-front of Cursor |
 | Delete       | Remove Text in-back of Cursor  |
 | Page Up/Down | Move Editor View Up/Down       |
