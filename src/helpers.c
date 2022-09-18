@@ -30,8 +30,38 @@
 #include <ctype.h>
 #include <stdio.h>
 #include <math.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include "helpers.h"
+#include "log/log.h"
+
+/*
+	* Checks if the passed file path is a valid file and not a directory or a device file
+	* Returns -> 0 (a valid file), 1 (a directory), 2 (a device file), 3 (doesn't exist)
+*/
+enum PathType GetPathInfo(char *file) {
+	struct stat fileInfo;
+
+	/* First check that the file exists and is readable. */
+	if (access(file, R_OK) != 0)
+		return PATH_ENOENT;
+
+	/* If the thing exists, it may be neither a directory nor a device. */
+	if (
+		stat(file, &fileInfo) != -1 &&
+		(
+			S_ISDIR(fileInfo.st_mode)  ||
+			S_ISCHR(fileInfo.st_mode)  ||
+			S_ISBLK(fileInfo.st_mode))
+		) {
+
+		if (S_ISDIR(fileInfo.st_mode)) return PATH_DIR;
+		return PATH_DEVICE;
+	} else {
+		return PATH_FILE;
+	}
+}
 
 bool str_startswith(const char *prefix, const char *str) {
 	return strncmp(prefix, str, strlen(prefix)) == 0;
@@ -41,8 +71,12 @@ char* _strdup(const char *str) {
 	if (str == NULL) return NULL;
 
 	int n = strlen(str) + 1;
-	char *dup = malloc(n);
-	if(dup) strcpy(dup, str);
+	char* dup = malloc(n * sizeof(char));
+	memset(dup, '\0', n * sizeof(char));
+
+	if (dup) {
+		memcpy(dup, str, n);
+	}
 	return dup;
 }
 

@@ -329,7 +329,7 @@ static inline void EditorFreeRow(erow *row) {
 	free(row->hl);
 }
 
-static inline void EditorDelRow(int at) {
+static inline void EditorDeleteRow(int at) {
 	if (at < 0 || at >= E.numrows) return;
 	EditorFreeRow(&E.row[at]);
 	memmove(&E.row[at], &E.row[at + 1], sizeof(erow) * (E.numrows - at - 1));
@@ -401,7 +401,7 @@ void EditorDeleteChar() {
 	} else {
 		E.cx = E.row[E.cy - 1].size;
 		EditorRowAppendStr(&E.row[E.cy - 1], row->chars, row->size);
-		EditorDelRow(E.cy);
+		EditorDeleteRow(E.cy);
 		E.cy--;
 	}
 }
@@ -428,12 +428,23 @@ char *EditorRowsToStr(int *buflen) {
 	return buf;
 }
 
-void EditorOpenDoc(char *filePath) {
-	if (E.filePath != NULL)
-		free(E.filePath);
+void EditorOpenDoc(char* filePath) {
+	if (filePath == NULL) return;
+	enum PathType pInfo = GetPathInfo(filePath);
+
+	if (pInfo != 0) {
+		EditorSetStatusMessage("\"%s\" %s", filePath, pInfo == PATH_DIR ? "is a directory!" : (pInfo == PATH_DEVICE ? "is a device file!" : "doesn't exist!"));
+		return;
+	}
+
+	if (E.filePath != NULL) free(E.filePath);
+	// We don't free E.fileName since basename() tells us not to
+
+	E.filePath = NULL;
+	E.fileName = NULL;
 
 	E.filePath = _strdup(filePath);
-	E.fileName = basename(filePath);
+	E.fileName = basename(E.filePath);
 	EditorSelectSyntax();
 
 	FILE *fp = fopen(filePath, "r+");
@@ -443,6 +454,11 @@ void EditorOpenDoc(char *filePath) {
 	size_t linecap = 0;
 	ssize_t linelen;
 
+	// Free All The Lines
+	for (int i = 0; i < E.numrows; ++i)
+		EditorDeleteRow(i);
+
+	// Insert New Lines
 	while ((linelen = getline(&line, &linecap, fp)) != -1) {
 		while (linelen > 0 && (line[linelen - 1] == '\n' || line[linelen - 1] == '\r'))
 			linelen--;
@@ -536,6 +552,24 @@ void EditorSearchCallback(char *query, int key) {
 			memset(&row->hl[match - row->render], HL_MATCH, strlen(query));
 			break;
 		}
+	}
+}
+
+void EditorRequestOpenDoc() {
+	char* query = NULL;
+	if (E.dirty) {
+		query = EditorPromptText("Save the modified buffer?: %s (y/N -> Enter/ESC)", NULL);
+		if (query && query[0] == 'y') {
+			EditorSaveDoc();
+		}
+		if (query) free(query);
+	}
+
+	query = EditorPromptText("File to open [From ./]: %s (Enter/ESC)", NULL);
+	if (query) {
+		log_info("Requested To Open \"%s\"", query);
+		EditorOpenDoc(query);
+		free(query);
 	}
 }
 
@@ -689,7 +723,8 @@ static inline void EditorDrawHeaderbar(abuf_t *ab) {
 	abAppend(ab, "\x1b[1;31m", 7); // Set Text To Bold
 	abAppend(ab, "\x1b[38;5;12m", 10); // Text Color
 	abAppend(ab, "\x1b[48;5;237m", 11); // Background Color
-	char header[80], rheader[80];
+	char header[80] = "", rheader[80] = "";
+
 	int len = snprintf(header, sizeof(header), " %s", E.fileName ? E.fileName : "[New Buffer]");
 	int rlen = snprintf(rheader, sizeof(rheader), "%s", E.dirty ? "(Modified) " : "");
 	if (len > E.screencols) len = E.screencols;
@@ -703,6 +738,7 @@ static inline void EditorDrawHeaderbar(abuf_t *ab) {
 			len++;
 		}
 	}
+
 	abAppend(ab, "\x1b[39m", 5); // Reset Foreground Color To Default
 	abAppend(ab, "\x1b[49m", 5); // Reset Foreground Color To Default
 	abAppend(ab, "\x1b[m", 3); // Go back to normal text formatting.
@@ -843,6 +879,10 @@ static inline void EditorProcessKeys() {
 			EditorSaveDoc();
 			break;
 		}
+		case CTRL_KEY('o'): {
+			EditorRequestOpenDoc();
+			break;
+		}
 		case HOME_KEY: {
 			E.cx = 0;
 			break;
@@ -914,6 +954,7 @@ static inline void EditorInit() {
 
 	if (TermGetWinSize(&E.screenrows, &E.screencols) == -1) die("getWindowSize");
 	E.screenrows -= 3;
+	L_Arr = LoadAllLanguages();
 }
 
 void FreeEverything(void) {
@@ -936,7 +977,6 @@ int main(int argc, char *argv[]) {
 	LogFilePtr = fopen("aru.log", "w");
 	log_add_fp(LogFilePtr, LOG_TRACE);
 
-	L_Arr = LoadAllLanguages();
 	TermSwitchToAlternativeScreen();
 	TermEnableRawMode();
 	EditorInit();

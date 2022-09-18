@@ -30,9 +30,25 @@
 
 #include <stdbool.h>
 
-bool str_startswith(const char *prefix, const char *str);
-char* _strdup(const char *str);
+enum PathType {
+    PATH_FILE,
+    PATH_DIR,
+    PATH_DEVICE,
+    PATH_ENOENT
+};
+
+enum PathType GetPathInfo(char *file);
+
+// Checks if "str" starts with "prefix"
+bool str_startswith(const char* prefix, const char* str);
+
+// Duplicates "str" and returns a pointer to it
+char* _strdup(const char* str);
+
+// Converts "str" to lowercase
 void strLower(char* str, int len);
+
+// Returns "bytes" converted to a readable string
 char* formatBytes(int bytes);
 
 #endif
