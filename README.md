@@ -4,6 +4,22 @@ a text editor
 :warning: Under Heavy Development :warning:
 
 ---
+### Shortcuts
+
+| Key          | Description    |
+|--------------|----------------|
+| Ctrl + O     | Open File      |
+| Ctrl + S     | Save File      |
+| Ctrl + S     | Save File      |
+| Ctrl + F     | Find Text      |
+| Backspace    | Remove Text in-front of Cursor |
+| Delete       | Remove Text in-back of Cursor  |
+| Page Up/Down | Move Editor View Up/Down       |
+| Arrow Keys   | Move Cursor Around             |
+| Home         | Move Cursor To Start Of Line   |
+| End          | Move Cursor To End Of Line     |
+
+---
 ### Implement
 - [x] Simple Text Editing
 - [x] Syntax Highlighting
@@ -14,9 +30,9 @@ a text editor
 - [ ] Try [pcre2](https://github.com/PCRE2Project/pcre2) for "advanced" regex
 - [ ] Undo-Redo
 - [x] Custom Themes and Syntaxes
-- [ ] Opening a file in editor itself
+- [x] Opening a file in editor itself
 - [ ] Loading Themes and syntaxes from disk
-- [ ] Regex support for syntaxes
+- [x] Regex support for syntaxes
 
 ---
 ### Screenshots
