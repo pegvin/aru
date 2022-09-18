@@ -539,6 +539,23 @@ void EditorSearchCallback(char *query, int key) {
 	}
 }
 
+void EditorRequestQuit() {
+	char* query = NULL;
+	if (!E.dirty) goto completelyExit;
+
+	query = EditorPromptText("Save the modified buffer?: %s (y/N -> Enter/ESC)", NULL);
+	if (query && query[0] == 'y') {
+		EditorSaveDoc();
+	}
+
+completelyExit:
+	if (query) free(query);
+	query = NULL;
+	write(STDOUT_FILENO, "\x1b[2J", 4); // erase entire screen
+	write(STDOUT_FILENO, "\x1b[H", 3);  // move cursor to home position (0, 0)
+	exit(0);
+}
+
 void EditorSearchText() {
 	int saved_cx = E.cx;
 	int saved_cy = E.cy;
@@ -811,8 +828,6 @@ void EditorMoveCursor(int key) {
 }
 
 static inline void EditorProcessKeys() {
-	static int quit_times = ARU_QUIT_TIMES;
-
 	int c = TermReadKey();
 
 	switch (c) {
@@ -821,15 +836,7 @@ static inline void EditorProcessKeys() {
 			break;
 		}
 		case CTRL_KEY('q'): {
-			if (E.dirty && quit_times > 0) {
-				EditorSetStatusMessage("WARNING!!! File has unsaved changes. "
-					"Press Ctrl-Q %d more times to quit.", quit_times);
-				quit_times--;
-				return;
-			}
-			write(STDOUT_FILENO, "\x1b[2J", 4); // erase entire screen
-			write(STDOUT_FILENO, "\x1b[H", 3);  // move cursor to home position (0, 0)
-			exit(0);
+			EditorRequestQuit();
 			break;
 		}
 		case CTRL_KEY('s'): {
@@ -885,8 +892,6 @@ static inline void EditorProcessKeys() {
 			break;
 		}
 	}
-
-	quit_times = ARU_QUIT_TIMES;
 }
 
 /*** init ***/
