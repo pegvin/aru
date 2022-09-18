@@ -897,7 +897,6 @@ static inline void EditorProcessKeys() {
 			break;
 		}
 		case BACKSPACE:
-		case CTRL_KEY('h'):
 		case DEL_KEY: {
 			if (c == DEL_KEY) EditorMoveCursor(ARROW_RIGHT);
 			EditorDeleteChar();
