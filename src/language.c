@@ -63,6 +63,12 @@ language_t* LoadLanguage(const char* jsonText) {
 	L->multiline_comment_start = _strdup(mCommentStart);
 	L->multiline_comment_end = _strdup(mCommentEnd);
 	L->flags = HL_HIGHLIGHT_NUMBERS | HL_HIGHLIGHT_STRINGS;
+	L->keywords1 = NULL;
+	L->keywords2 = NULL;
+	L->patterns = NULL;
+	L->totalKeywords1 = 0;
+	L->totalKeywords2 = 0;
+	L->totalPatterns = 0;
 
 	if (totalPatterns != NULL) {
 		int totalPatternsInt = atoi(totalPatterns);
