@@ -103,7 +103,7 @@ def GatherFiles(Directories):
 	return files
 
 # Get all the c and c++ files in src, recursively.
-sources = GatherFiles(['src/', 'lib/log/'])
+sources = GatherFiles(['src/', 'lib/log/', 'lib/ini/'])
 
 # Header Directories.
 env.Append(

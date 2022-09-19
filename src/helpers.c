@@ -76,8 +76,11 @@ char* _strdup(const char *str) {
 
 	if (dup) {
 		memcpy(dup, str, n);
+		return dup;
 	}
-	return dup;
+
+	free(dup);
+	return NULL;
 }
 
 void strLower(char* str, int len) {
