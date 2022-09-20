@@ -28,54 +28,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <json-c/json.h>
 
 #include "theme.h"
 #include "colors.h"
 #include "helpers.h"
-
-void _set_color(char* name, int value, theme_t* t) {
-	int* color = NULL;
-
-	if (strncmp(name, "comment", 7) == 0) {
-		color = &t->COMMENT;
-	} else if (strncmp(name, "mlcomment", 9) == 0) {
-		color = &t->MLCOMMENT;
-	} else if (strncmp(name, "keyword1", 8) == 0) {
-		color = &t->KEYWORD1;
-	} else if (strncmp(name, "keyword2", 8) == 0) {
-		color = &t->KEYWORD2;
-	} else if (strncmp(name, "string", 6) == 0) {
-		color = &t->STRING;
-	} else if (strncmp(name, "number", 6) == 0) {
-		color = &t->NUMBER;
-	} else if (strncmp(name, "match", 5) == 0) {
-		color = &t->MATCH;
-	} else if (strncmp(name, "default", 7) == 0) {
-		color = &t->DEFAULT;
-	} else {
-		color = &t->DEFAULT;
-	}
-
-	(*color) = value;
-}
+#include "ini/ini.h"
+#include "log/log.h"
 
 theme_t* ThemeLoadFrom(const char* jsonText) {
-	struct json_object* ParsedJSON;
-	struct json_object* name;
-	struct json_object* _colors;
-
-	ParsedJSON = json_tokener_parse(jsonText);
-	json_object_object_get_ex(ParsedJSON, "name", &name);
-	json_object_object_get_ex(ParsedJSON, "colors", &_colors);
-
-	printf("Loading %s theme...\n", json_object_get_string(name));
+	ini_t* IniConfig = ini_load_txt(jsonText);
 
 	theme_t* t = malloc(sizeof(theme_t));
 
 	{
 		int _col = -1;
-		if (jsonText == NULL) _col = FG_WHITE;
+		if (IniConfig == NULL) _col = FG_WHITE;
 
 		t->DEFAULT = _col;
 		t->COMMENT = _col;
@@ -87,34 +54,32 @@ theme_t* ThemeLoadFrom(const char* jsonText) {
 		t->MATCH = _col;
 	}
 
-	if (jsonText == NULL)
-		return t;
+	if (IniConfig != NULL) {
+		const char* name = ini_get(IniConfig, "aru.theme", "name");
+		if (name != NULL)
+			log_info("Loading %s theme...\n", name);
 
-	enum json_type type;
-	json_object_object_foreach(_colors, key, val) {
-		type = json_object_get_type(val);
-		switch (type) {
-			case json_type_int: {
-				int parsedVal = json_object_get_int(val);
-				strLower(key, strlen(key));
-				_set_color(key, parsedVal, t);
-				break;
-			}
-			case json_type_string:
-			case json_type_null:
-			case json_type_boolean:
-			case json_type_double:
-			case json_type_object:
-			case json_type_array:
-				break;
-		}
+		const char* comment = ini_get(IniConfig, "aru.theme", "comment");
+		const char* mlcomment = ini_get(IniConfig, "aru.theme", "mlcomment");
+		const char* keyword1 = ini_get(IniConfig, "aru.theme", "keyword1");
+		const char* keyword2 = ini_get(IniConfig, "aru.theme", "keyword2");
+		const char* string = ini_get(IniConfig, "aru.theme", "string");
+		const char* number = ini_get(IniConfig, "aru.theme", "number");
+		const char* match = ini_get(IniConfig, "aru.theme", "match");
+		const char* _default = ini_get(IniConfig, "aru.theme", "default");
+
+		if (_default != NULL)  { t->DEFAULT = atoi(_default); }
+		if (comment != NULL)   { t->COMMENT = atoi(comment); }
+		if (mlcomment != NULL) { t->MLCOMMENT = atoi(mlcomment); }
+		if (keyword1 != NULL)  { t->KEYWORD2 = atoi(keyword1); }
+		if (keyword2 != NULL)  { t->KEYWORD1 = atoi(keyword2); }
+		if (string != NULL)    { t->STRING = atoi(string); }
+		if (number != NULL)    { t->NUMBER = atoi(number); }
+		if (match != NULL)     { t->MATCH = atoi(match); }
 	}
 
-	while (json_object_put(ParsedJSON) != 1) {}
-	ParsedJSON = NULL;
-	name = NULL;
-	_colors = NULL;
-
+	if (IniConfig != NULL) ini_free(IniConfig);
+	IniConfig = NULL;
 	return t;
 }
 

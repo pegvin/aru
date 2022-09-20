@@ -949,7 +949,7 @@ static inline void EditorInit() {
 	E.statusmsg[0] = '\0';
 	E.statusmsg_time = 0;
 	E.syntax = NULL;
-	E.theme = ThemeLoadFrom(AssetsGet("data/themes/dark.json", NULL));
+	E.theme = ThemeLoadFrom(AssetsGet("data/themes/dark.ini", NULL));
 
 	if (TermGetWinSize(&E.screenrows, &E.screencols) == -1) die("getWindowSize");
 	E.screenrows -= 3;

@@ -112,7 +112,7 @@ env.Append(
 )
 
 env.Append(
-	LIBS=['m', 'json-c', 'tre'],
+	LIBS=['m', 'tre'],
 	CCFLAGS=['-DLOG_USE_COLOR']
 )
 
