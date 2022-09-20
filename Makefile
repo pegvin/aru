@@ -11,9 +11,5 @@ release:
 gen-assets:
 	python3 tools/create_assets.py
 
-Themes = ./data/themes
-validate-json:# Install jsonlint via npm - npm install jsonlint -g
-	$(foreach file, $(wildcard $(Themes)/*), jsonlint $(file);)
-
 clean:
 	scons -c

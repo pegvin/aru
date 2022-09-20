@@ -5,23 +5,6 @@ on:
   pull_request:
 
 jobs:
-  validate-json:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: recursive
-
-    - uses: actions/setup-node@v3
-      with:
-        node-version: 18
-
-    - name: Install Dep
-      run: npm install jsonlint -g
-
-    - name: Validate
-      run: make validate-json
-
   linux-x86_64:
     runs-on: ubuntu-latest
     steps:
@@ -29,20 +12,9 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Install Git, Scons, cmake & libtre
+    - name: Install Git, Scons & libtre
       run: |
-        sudo apt-get install git scons cmake libtre-dev libtre5
-
-    - name: Build & Install json-c
-      run: | # XX - Build Static Library & Use That Instead
-        cd ..
-        git clone https://github.com/json-c/json-c -b json-c-0.16-20220414 json-c
-        cd json-c
-        mkdir build
-        cd build
-        cmake -DBUILD_SHARED_LIBS=On -DCMAKE_BUILD_TYPE=Release ..
-        make
-        sudo make install
+        sudo apt-get install git scons libtre-dev libtre5
 
     - name: Build
       run: make gen-assets release
@@ -64,20 +36,9 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Install scons, cmake, libtre & autotools
+    - name: Install scons, libtre & autotools
       run: |
-        brew install scons cmake tre autoconf automake libtool gettext
-
-    - name: Build & Install json-c
-      run: | # XX - Build Static Library & Use That Instead
-        cd ..
-        git clone https://github.com/json-c/json-c -b json-c-0.16-20220414 json-c
-        cd json-c
-        mkdir build
-        cd build
-        cmake -DBUILD_SHARED_LIBS=On -DCMAKE_BUILD_TYPE=Release ..
-        make
-        sudo make install
+        brew install scons tre autoconf automake libtool gettext
 
     - name: Build and install libtre
       run: |
