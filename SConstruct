@@ -104,11 +104,23 @@ def GatherFiles(Directories):
 
 # Get all the c and c++ files in src, recursively.
 sources = GatherFiles(['src/', 'lib/log/', 'lib/ini/'])
+sources.extend([
+	"lib/pcre2/src/pcre2_substitute.c", "lib/pcre2/src/pcre2_convert.c", "lib/pcre2/src/pcre2_dfa_match.c", "lib/pcre2/src/pcre2_find_bracket.c",
+    "lib/pcre2/src/pcre2_auto_possess.c", "lib/pcre2/src/pcre2_substring.c", "lib/pcre2/src/pcre2_match_data.c", "lib/pcre2/src/pcre2_xclass.c", "lib/pcre2/src/pcre2_study.c",
+    "lib/pcre2/src/pcre2_ucd.c", "lib/pcre2/src/pcre2_maketables.c", "lib/pcre2/src/pcre2_compile.c", "lib/pcre2/src/pcre2_match.c", "lib/pcre2/src/pcre2_context.c",
+    "lib/pcre2/src/pcre2_string_utils.c", "lib/pcre2/src/pcre2_tables.c", "lib/pcre2/src/pcre2_serialize.c", "lib/pcre2/src/pcre2_ord2utf.c", "lib/pcre2/src/pcre2_error.c",
+    "lib/pcre2/src/pcre2_config.c", "lib/pcre2/src/pcre2_chartables.c", "lib/pcre2/src/pcre2_newline.c", "lib/pcre2/src/pcre2_jit_compile.c", "lib/pcre2/src/pcre2_fuzzsupport.c",
+    "lib/pcre2/src/pcre2_valid_utf.c", "lib/pcre2/src/pcre2_extuni.c", "lib/pcre2/src/pcre2_script_run.c", "lib/pcre2/src/pcre2_pattern_info.c"
+])
 
 # Header Directories.
 env.Append(
-	CPATH=['src/', 'lib/'],
-	CPPPATH=['src/', 'lib/']
+	CPATH=['src/', 'lib/', 'lib/pcre2/src/'],
+	CPPPATH=['src/', 'lib/', 'lib/pcre2/src/'],
+	CCFLAGS=[
+		'-DPCRE2_STATIC', '-DHAVE_CONFIG_H', '-DPCRE2_CODE_UNIT_WIDTH=8',
+		'-DSUPPORT_UNICODE', '-DSUPPORT_UTF8'
+	]
 )
 
 env.Append(
