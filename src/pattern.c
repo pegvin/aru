@@ -40,11 +40,11 @@ pattern_t* LoadPattern(const char* regexStr, const char* _colorStr) {
 		if (result == REG_OK) {
 			p = malloc(sizeof(pattern_t));
 			p->regex = r;
+			p->color = HL_NORMAL;
+
 			if (_colorStr != NULL) {
 				char* colorStr = _strdup(_colorStr);
-				if (colorStr == NULL) {
-					p->color = HL_NORMAL;
-				} else {
+				if (colorStr != NULL) {
 					strLower(colorStr, strlen(colorStr));
 					if (strncmp(colorStr, "comment", 7) == 0) {
 						p->color = HL_COMMENT;
@@ -62,14 +62,11 @@ pattern_t* LoadPattern(const char* regexStr, const char* _colorStr) {
 						p->color = HL_MATCH;
 					} else if (strncmp(colorStr, "default", 7) == 0) {
 						p->color = HL_NORMAL;
-					} else {
-						p->color = HL_NORMAL;
 					}
+
 					free(colorStr);
 					colorStr = NULL;
 				}
-			} else {
-				p->color = HL_NORMAL;
 			}
 		} else {
 			tre_regfree(r);
