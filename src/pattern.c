@@ -31,7 +31,7 @@
 #include "pattern.h"
 #include "helpers.h"
 
-pattern_t* LoadPattern(const char* regexStr, const char* colorStr) {
+pattern_t* LoadPattern(const char* regexStr, const char* _colorStr) {
 	pattern_t* p = NULL;
 
 	if (regexStr != NULL) {
@@ -40,26 +40,33 @@ pattern_t* LoadPattern(const char* regexStr, const char* colorStr) {
 		if (result == REG_OK) {
 			p = malloc(sizeof(pattern_t));
 			p->regex = r;
-			if (colorStr != NULL) {
-				strLower(colorStr, strlen(colorStr));
-				if (strncmp(colorStr, "comment", 7) == 0) {
-					p->color = HL_COMMENT;
-				} else if (strncmp(colorStr, "mlcomment", 9) == 0) {
-					p->color = HL_MLCOMMENT;
-				} else if (strncmp(colorStr, "keyword1", 8) == 0) {
-					p->color = HL_KEYWORD1;
-				} else if (strncmp(colorStr, "keyword2", 8) == 0) {
-					p->color = HL_KEYWORD2;
-				} else if (strncmp(colorStr, "string", 6) == 0) {
-					p->color = HL_STRING;
-				} else if (strncmp(colorStr, "number", 6) == 0) {
-					p->color = HL_NUMBER;
-				} else if (strncmp(colorStr, "match", 5) == 0) {
-					p->color = HL_MATCH;
-				} else if (strncmp(colorStr, "default", 7) == 0) {
+			if (_colorStr != NULL) {
+				char* colorStr = _strdup(_colorStr);
+				if (colorStr == NULL) {
 					p->color = HL_NORMAL;
 				} else {
-					p->color = HL_NORMAL;
+					strLower(colorStr, strlen(colorStr));
+					if (strncmp(colorStr, "comment", 7) == 0) {
+						p->color = HL_COMMENT;
+					} else if (strncmp(colorStr, "mlcomment", 9) == 0) {
+						p->color = HL_MLCOMMENT;
+					} else if (strncmp(colorStr, "keyword1", 8) == 0) {
+						p->color = HL_KEYWORD1;
+					} else if (strncmp(colorStr, "keyword2", 8) == 0) {
+						p->color = HL_KEYWORD2;
+					} else if (strncmp(colorStr, "string", 6) == 0) {
+						p->color = HL_STRING;
+					} else if (strncmp(colorStr, "number", 6) == 0) {
+						p->color = HL_NUMBER;
+					} else if (strncmp(colorStr, "match", 5) == 0) {
+						p->color = HL_MATCH;
+					} else if (strncmp(colorStr, "default", 7) == 0) {
+						p->color = HL_NORMAL;
+					} else {
+						p->color = HL_NORMAL;
+					}
+					free(colorStr);
+					colorStr = NULL;
 				}
 			} else {
 				p->color = HL_NORMAL;
