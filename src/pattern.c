@@ -41,6 +41,7 @@ pattern_t* LoadPattern(const char* regexStr, const char* _colorStr) {
 
 	if (result != REG_OK) {
 		tre_regfree(r);
+		free(r);
 		r = NULL;
 		return NULL;
 	}
