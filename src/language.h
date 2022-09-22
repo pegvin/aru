@@ -38,8 +38,9 @@
 
 typedef struct editorSyntax {
 	char*      name;             // Language Name
-	char**     extensions;       // Array Of File Extensions Like .c, .h, .cpp
-	int        totalExtensions;  // Total Elements in "extensions"
+    pattern_t* filePattern;      // File Extension Regex
+	// char**     extensions;       // Array Of File Extensions Like .c, .h, .cpp
+	// int        totalExtensions;  // Total Elements in "extensions"
 	// KeywordsXX and totalKeywordsXX
 	char**     keywords1;
 	int        totalKeywords1;

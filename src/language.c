@@ -40,25 +40,30 @@ language_t* LoadLanguage(const char* jsonText) {
 	if (IniConfig == NULL) return NULL;
 
 	const char* name = ini_get(IniConfig, "aru.theme", "name");
+	const char* filePattern = ini_get(IniConfig, "aru.theme", "filePattern");
 	const char* sLineComment = ini_get(IniConfig, "aru.theme", "singleLineComment");
 	const char* mCommentStart = ini_get(IniConfig, "aru.theme", "multiLineCommentStart");
 	const char* mCommentEnd = ini_get(IniConfig, "aru.theme", "multiLineCommentEnd");
-	const char* extensions = ini_get(IniConfig, "aru.theme", "extensions");
 	const char* totalPatterns = ini_get(IniConfig, "aru.theme", "totalPatterns");
 	const char* keywords1 = ini_get(IniConfig, "aru.theme", "keywords1");
 	const char* keywords2 = ini_get(IniConfig, "aru.theme", "keywords2");
+
+	if (filePattern == NULL) goto onFail;
+
+	pattern_t* _filePat = LoadPattern(filePattern, "default");
+	if (_filePat == NULL) goto onFail;
 
 	// log_info("%s", name);
 	// log_info("%s", sLineComment);
 	// log_info("%s", mCommentStart);
 	// log_info("%s", mCommentEnd);
-	// log_info("%s", extensions);
 	// log_info("%s", totalPatterns);
 	// log_info("%s", keywords1);
 	// log_info("%s", keywords2);
 
 	L = malloc(sizeof(language_t));
 	L->name = _strdup(name);
+	L->filePattern = _filePat;
 	L->singleline_comment_start = _strdup(sLineComment);
 	L->multiline_comment_start = _strdup(mCommentStart);
 	L->multiline_comment_end = _strdup(mCommentEnd);
@@ -95,36 +100,6 @@ language_t* LoadLanguage(const char* jsonText) {
 
 			#undef _SECTION_STR_MAX
 		}
-	}
-
-	if (extensions != NULL) {
-		char* copy = _strdup(extensions);
-		L->totalExtensions = 0;
-		char* token = NULL;
-
-		// Calculate Total Keywords
-		token = strtok(copy, " ");
-		while (token != NULL) {
-			L->totalExtensions++;
-			token = strtok(NULL, " ");
-		}
-
-		// Allocate Memory & Copy Strings
-		if (L->totalExtensions > 0) {
-			free(copy);
-			copy = _strdup(extensions);
-			L->extensions = malloc(sizeof(char*) * L->totalExtensions);
-			token = strtok(copy, " ");
-			int i = 0;
-			while (token != NULL) {
-				L->extensions[i] = _strdup(token);
-				token = strtok(NULL, " ");
-				i++;
-			}
-		}
-
-		free(copy);
-		copy = NULL;
 	}
 
 	if (keywords1 != NULL) {
@@ -187,6 +162,7 @@ language_t* LoadLanguage(const char* jsonText) {
 		copy = NULL;
 	}
 
+onFail:
 	ini_free(IniConfig);
 	IniConfig = NULL;
 
@@ -195,10 +171,9 @@ language_t* LoadLanguage(const char* jsonText) {
 
 language_arr_t* LoadAllLanguages() {
 	language_arr_t* L_Arr = malloc(sizeof(language_arr_t));
-	L_Arr->numOfLangs = 2;
+	L_Arr->numOfLangs = 1;
 	L_Arr->languages = malloc(sizeof(language_t*) * L_Arr->numOfLangs);
 	L_Arr->languages[0] = LoadLanguage(AssetsGet("data/languages/c.ini", NULL));
-	L_Arr->languages[1] = LoadLanguage(AssetsGet("data/languages/cpp.ini", NULL));
 
 	return L_Arr;
 }
@@ -222,16 +197,8 @@ void FreeLanguageArr(language_arr_t* L_Arr) {
 void FreeLanguage(language_t* L) {
 	if (L == NULL) return;
 
-	if (L->extensions != NULL) {
-		for (int i = 0; i < L->totalExtensions; ++i) {
-			if (L->extensions[i] != NULL) {
-				free(L->extensions[i]);
-				L->extensions[i] = NULL;
-			}
-		}
-		free(L->extensions);
-		L->extensions = NULL;
-	}
+	FreePattern(L->filePattern);
+	L->filePattern = NULL;
 
 	if (L->keywords1 != NULL) {
 		for (int i = 0; i < L->totalKeywords1; ++i) {
@@ -288,7 +255,6 @@ void FreeLanguage(language_t* L) {
 
 	L->flags = 0;
 	L->totalKeywords1 = -1;
-	L->totalExtensions = -1;
 	free(L);
 }
 

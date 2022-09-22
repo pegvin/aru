@@ -229,22 +229,19 @@ void EditorSelectSyntax() {
 	E.syntax = NULL;
 	if (E.filePath == NULL) return;
 
-	char* ext = strrchr(E.filePath, '.');
-
 	for (unsigned int j = 0; j < L_Arr->numOfLangs; j++) {
 		language_t* s = L_Arr->languages[j];
-		for (int i = 0; i < s->totalExtensions; ++i) {
-			int is_ext = (s->extensions[i][0] == '.');
-			if ((is_ext && ext && !strcmp(ext, s->extensions[i])) || (!is_ext && strstr(E.filePath, s->extensions[i]))) {
-				E.syntax = s;
 
-				int filerow;
-				for (filerow = 0; filerow < E.numrows; filerow++) {
-					EditorSyntaxHighlightRow(&E.row[filerow]);
-				}
+		pattern_t* p = s->filePattern;
+		regmatch_t matches[1];
+		int result = tre_regexec(p->regex, E.filePath, 1, matches, 0);
+		if (result == REG_OK) {
+			E.syntax = s;
 
-				return;
+			for (int filerow = 0; filerow < E.numrows; filerow++) {
+				EditorSyntaxHighlightRow(&E.row[filerow]);
 			}
+			break;
 		}
 	}
 }
