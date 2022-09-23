@@ -76,7 +76,7 @@ if env['mode'] == 'debug' and target_os == 'posix':
 # CXXFLAGS  : only C++
 env.Append(
 	CFLAGS=['-std=c99', '-Wall'],
-	CXXFLAGS=['-std=c++17', '-Wall', '-Wno-narrowing']
+	CXXFLAGS=['-std=c++11', '-Wall', '-Wno-narrowing']
 )
 
 if env['mode'] == 'release':
