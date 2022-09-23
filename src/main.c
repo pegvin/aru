@@ -967,63 +967,7 @@ void FreeEverything(void) {
 	TermSwitchToMainScreen();
 }
 
-// #include "pcre2.h"
-
 int main(int argc, char *argv[]) {
-	// const char regexStr[130] = "(^#define*)|(^#include*)|(^#if*)|(^#ifndef*)|(^#ifdef*)|(^#endif*)|(^#elif*)|(^#else*)|(^#elseif*)|(^#warning*)|(^#error*)";
-	// const char subject[30] = "#include \"lmao.h\"\n";
-
-	// int errorNumber;
-	// PCRE2_SPTR errorOffset;
-	// size_t len = 130;
-
-	// pcre2_code* re = pcre2_compile(
-	// 	(PCRE2_SPTR)regexStr,
-	// 	len,
-	// 	PCRE2_UTF,
-	// 	&errorNumber,
-	// 	&errorOffset,
-	// 	NULL
-	// );
-	// if (!re) {
-	// 	PCRE2_UCHAR buffer[256];
-	// 	pcre2_get_error_message(errorNumber, buffer, sizeof(buffer));
-	// 	printf("regex compilation failed at offset %d: %s\n", (int)errorOffset, buffer);
-	// 	return 1;
-	// }
-
-	// size_t toMLen = 30, offset = 1, opts = 0;
-	// offset -= 1;
-	// toMLen -= offset;
-
-	// pcre2_match_data* md = pcre2_match_data_create_from_pattern(re, NULL);
-
-	// int rc = pcre2_match(re, (PCRE2_SPTR)&subject[offset], toMLen, 0, opts, md, NULL);
-	// if (rc < 0) {
-	// 	pcre2_match_data_free(md);
-	// 	if (rc != PCRE2_ERROR_NOMATCH) {
-	// 		PCRE2_UCHAR buffer[120];
-	// 		pcre2_get_error_message(rc, buffer, sizeof(buffer));
-	// 		printf("regex matching error %d: %s\n", rc, buffer);
-	// 	}
-	// 	return 0;
-	// }
-
-	// PCRE2_SIZE* ovector = pcre2_get_ovector_pointer(md);
-	// if (ovector[0] > ovector[1]) {
-	// 	printf("regex matching error: \\K was used in an assertion to set the match start after its end\n");
-	// 	pcre2_match_data_free(md);
-	// 	return 0;
-	// }
-
-	// for (int i = 0; i < rc*2; i++)
-	// 	printf("Str: %s\n", subject + (ovector[i]+offset+1));
-
-	// pcre2_match_data_free(md);
-
-	// if (re)
-	// 	pcre2_code_free(re);
-
 	atexit(FreeEverything);
 
 	LogFilePtr = fopen("aru.log", "w");
