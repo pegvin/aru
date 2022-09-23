@@ -148,7 +148,9 @@ int FindMatchPCRE(pcre2_code* re, const char* str, void (*callback)(long int sta
 				if (start < 0 || end < 0)
 					continue;
 
-				if (callback) callback(start, end, data);
+				if (callback)
+					callback(start < end ? start : end, start < end ? end : start, data); // Basically Pass The Smaller Value As Start & Bigger Value as End
+
 				totalFound++;
 				// printf(", RC: %d, Start: %ld, End: %ld\n", rc, start, end);
 			}
