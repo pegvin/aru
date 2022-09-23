@@ -50,6 +50,12 @@ editor_t E; // Holds Configuration & Stuff About Editor
 language_arr_t* L_Arr = NULL;
 FILE* LogFilePtr = NULL;
 
+struct onMatchFoundData {
+	pattern_t* p;
+	erow* row;
+	int i;
+};
+
 void die(const char *s) {
 	write(STDOUT_FILENO, "\x1b[2J", 4); // erase entire screen
 	write(STDOUT_FILENO, "\x1b[H", 3);  // move cursor to home position (0, 0)
@@ -62,6 +68,17 @@ void die(const char *s) {
 
 int is_separator(int c) {
 	return isspace(c) || c == '\0' || strchr(",.()+-/*=~%<>[];", c) != NULL;
+}
+
+void onMatchFound(long int start, long int end, void* _data) {
+	if (_data == NULL) return;
+
+	struct onMatchFoundData* data = (struct onMatchFoundData*) _data;
+	pattern_t* p = data->p;
+	erow* row = data->row;
+	int i = data->i;
+	memset((&row->hl[i]) + start, p->color, end - start);
+	// log_info("Match Found, Start: %ld, End: %ld", start, end);
 }
 
 void EditorSyntaxHighlightRow(erow *row) {
@@ -158,17 +175,10 @@ void EditorSyntaxHighlightRow(erow *row) {
 			int j = 0;
 			for (j = 0; j < E.syntax->totalPatterns; j++) {
 				pattern_t* p = E.syntax->patterns[j];
-				regmatch_t matches[1];
-				int result = tre_regexec(p->regex, &row->render[i], 1, matches, 0);
-				int klen = -1;
-				if (result == REG_OK) {
-					klen = matches[0].rm_eo - matches[0].rm_so;
-					if (klen > 0) {
-						memset((&row->hl[i]) + matches[0].rm_so, p->color, klen);
-						// i += matches[0].rm_eo; // We Don't Skip And Match With All The Patterns
-					};
-					break;
-				}
+				if (p == NULL) continue;
+
+				struct onMatchFoundData data = { p, row, i };
+				FindMatchPCRE(p->re, &row->render[i], onMatchFound, (void*)&data);
 			}
 
 			for (j = 0; j < E.syntax->totalKeywords1; j++) {
@@ -233,9 +243,8 @@ void EditorSelectSyntax() {
 		language_t* s = L_Arr->languages[j];
 
 		pattern_t* p = s->filePattern;
-		regmatch_t matches[1];
-		int result = tre_regexec(p->regex, E.filePath, 1, matches, 0);
-		if (result == REG_OK) {
+		int result = FindMatchPCRE(p->re, E.filePath, NULL, NULL);;
+		if (result > 0) {
 			E.syntax = s;
 
 			for (int filerow = 0; filerow < E.numrows; filerow++) {
