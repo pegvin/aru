@@ -86,7 +86,7 @@ if env['mode'] == 'release':
 
 if env['mode'] == 'debug':
 	env.Append(
-		CCFLAGS=['-O0', '-g', '-Wno-unused-function', '-pedantic', '-DIS_DEBUG']
+		CCFLAGS=['-O0', '-g', '-Wno-unused-function', '-pedantic', '-DIS_DEBUG', '-Wextra']
 	)
 
 def GatherFiles(Directories, Ignore):
