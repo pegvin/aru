@@ -51,23 +51,23 @@ if not env.GetOption('clean'):
 		],
 	)
 
-if os.environ.get('CC') == 'gcc' or env['mode'] == 'debug':
+if os.environ.get('CC') == 'gcc':
 	env.Replace(
 		CC='gcc', CXX='g++',
 		CFLAGS=['-Wno-unknown-pragma']
 	)
+
+	# Asan & Ubsan (need to come first).
+	if env['mode'] == 'debug' and target_os == 'posix':
+		env.Append(
+			CCFLAGS=['-fsanitize=address', '-fsanitize=undefined'],
+			LINKFLAGS=['-fsanitize=address', '-fsanitize=undefined'],
+			LIBS=['asan', 'ubsan']
+		)
 else:
 	env.Replace(
 		CC='clang', CXX='clang++',
 		CFLAGS=['-Wno-unknown-pragmas']
-	)
-
-# Asan & Ubsan (need to come first).
-if env['mode'] == 'debug' and target_os == 'posix':
-	env.Append(
-		CCFLAGS=['-fsanitize=address', '-fsanitize=undefined'],
-		LINKFLAGS=['-fsanitize=address', '-fsanitize=undefined'],
-		LIBS=['asan', 'ubsan']
 	)
 
 # Global compilation flags.
@@ -89,31 +89,42 @@ if env['mode'] == 'debug':
 		CCFLAGS=['-O0', '-g', '-Wno-unused-function', '-pedantic', '-DIS_DEBUG']
 	)
 
-def GatherFiles(Directories):
+def GatherFiles(Directories, Ignore):
 	if type(Directories) is not list:
 		Directories = [Directories];
+
+	if type(Ignore) is not list:
+		Ignore = [Ignore];
 
 	files = [];
 	for directory in Directories:
 		for root, dirnames, filenames in os.walk(directory):
 			for filename in filenames:
+				if filename in Ignore:
+					continue
+
 				if filename.endswith('.c') or filename.endswith('.cpp'):
 					files.append(os.path.join(root, filename))
 
 	return files
 
 # Get all the c and c++ files in src, recursively.
-sources = GatherFiles(['src/', 'lib/log/', 'lib/ini/'])
+sources = GatherFiles(
+	['src/', 'lib/log/', 'lib/ini/', 'lib/pcre2/src/'],
+	['pcre2_jit_match.c', 'pcre2_jit_misc.c', 'pcre2_ucptables.c']
+)
 
 # Header Directories.
+HEADER_LIBS = ['src/', 'lib/', 'lib/pcre2/src/']
+
 env.Append(
-	CPATH=['src/', 'lib/'],
-	CPPPATH=['src/', 'lib/']
+	CPATH=HEADER_LIBS,
+	CPPPATH=HEADER_LIBS
 )
 
 env.Append(
-	LIBS=['m', 'tre'],
-	CCFLAGS=['-DLOG_USE_COLOR']
+	LIBS=['m'],
+	CCFLAGS=['-DLOG_USE_COLOR', '-DPCRE2_STATIC', '-DHAVE_CONFIG_H', '-DPCRE2_CODE_UNIT_WIDTH=8', '-DSUPPORT_UNICODE', '-DSUPPORT_UTF8']
 )
 
 # Append external environment flags
