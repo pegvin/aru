@@ -30,24 +30,18 @@
 #include "colors.h"
 #include "pattern.h"
 #include "helpers.h"
+#include "log/log.h"
 
 pattern_t* LoadPattern(const char* regexStr, const char* _colorStr) {
 	pattern_t* p = NULL;
 
 	if (regexStr == NULL) return NULL;
 
-	regex_t* r = malloc(sizeof(regex_t));
-	int result = tre_regcomp(r, regexStr, REG_EXTENDED);
-
-	if (result != REG_OK) {
-		tre_regfree(r);
-		free(r);
-		r = NULL;
-		return NULL;
-	}
+	pcre2_code* re = CompileRegexPCRE2(regexStr);
+	if (re == NULL) return NULL;
 
 	p = malloc(sizeof(pattern_t));
-	p->regex = r;
+	p->re = re;
 	p->color = HL_NORMAL;
 
 	if (_colorStr != NULL) {
@@ -82,10 +76,87 @@ pattern_t* LoadPattern(const char* regexStr, const char* _colorStr) {
 
 void FreePattern(pattern_t* p) {
 	if (p != NULL) {
-		tre_regfree(p->regex);
-		free(p->regex);
-		p->regex = NULL;
+		FreeRegexPCRE2(p->re);
+		p->re = NULL;
 		p->color = 0;
 		free(p);
 	}
+}
+
+pcre2_code* CompileRegexPCRE2(const char* regexStr) {
+	int errorNumber;
+	PCRE2_SIZE errorOffset;
+
+	pcre2_code* re = pcre2_compile(
+		(PCRE2_SPTR)regexStr,
+		strlen(regexStr),
+		PCRE2_UTF,
+		&errorNumber,
+		&errorOffset,
+		NULL
+	);
+
+	if (!re) {
+		FreeRegexPCRE2(re);
+#if IS_DEBUG
+		PCRE2_UCHAR buffer[256];
+		pcre2_get_error_message(errorNumber, buffer, sizeof(buffer));
+		log_error("regex compilation failed at offset %d: %s", (int)errorOffset, buffer);
+#endif
+		return NULL;
+	}
+
+	return re;
+}
+
+void FreeRegexPCRE2(pcre2_code* re) {
+	if (re != NULL) {
+		pcre2_code_free(re);
+		re = NULL;
+	}
+}
+
+int FindMatchPCRE(pcre2_code* re, const char* str, void (*callback)(long int start, long int end, void* data), void* data) {
+	if (re == NULL || str == NULL) return -1;
+
+	pcre2_match_data* matchData = NULL;
+	matchData = pcre2_match_data_create_from_pattern(re, NULL);
+	int totalFound = 0;
+
+	int rc = pcre2_match(re, (PCRE2_SPTR)str, strlen(str), 0, 0, matchData, NULL);
+	if (rc < 0) {
+#if IS_DEBUG
+		if (rc == PCRE2_ERROR_NOMATCH) {
+			log_warn("No Matches Found!");
+		} else {
+			PCRE2_UCHAR buffer[120];
+			pcre2_get_error_message(rc, buffer, sizeof(buffer));
+			log_error("regex matching error %d: %s", rc, buffer);
+		}
+	} else if (rc == 1) {
+		log_warn("No Matches Found!");
+#endif
+	} else {
+		PCRE2_SIZE* ovector = pcre2_get_ovector_pointer(matchData);
+		if (ovector[0] > ovector[1]) {
+#if IS_DEBUG
+			log_error("regex matching error: \\K was used in an assertion to set the match start after its end\n");
+#endif
+		} else {
+			for (int i = 0; i < rc; i++) {
+				long int start = ovector[i], end = ovector[i + 1];
+				if (start < 0 || end < 0)
+					continue;
+
+				if (callback) callback(start, end, data);
+				totalFound++;
+				// printf(", RC: %d, Start: %ld, End: %ld\n", rc, start, end);
+			}
+		}
+	}
+
+	if (matchData)
+		pcre2_match_data_free(matchData);
+
+	return totalFound;
 }

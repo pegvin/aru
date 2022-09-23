@@ -28,15 +28,21 @@
 #ifndef PATTERN_H
 #define PATTERN_H
 
-#include <tre/tre.h>
 #include "colors.h"
+#include "pcre2.h"
 
 typedef struct {
-	regex_t* regex;
+    pcre2_code* re;
 	syntax_color_t color;
 } pattern_t;
 
 pattern_t* LoadPattern(const char* regexStr, const char* colorStr);
 void FreePattern(pattern_t* p);
+
+// Compiles Regex String, Used By LoadPattern.
+pcre2_code* CompileRegexPCRE2(const char* regexStr);
+void FreeRegexPCRE2(pcre2_code* re);
+int FindMatchPCRE(pcre2_code* re, const char* str, void (*callback)(long int start, long int end, void* data), void* data);
+
 
 #endif
