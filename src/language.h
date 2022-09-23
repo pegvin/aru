@@ -28,8 +28,6 @@
 #ifndef LANGUAGE_H
 #define LANGUAGE_H
 
-#include <tre/tre.h>
-
 #include "main.h"
 #include "pattern.h"
 
