@@ -90,7 +90,7 @@ pcre2_code* CompileRegexPCRE2(const char* regexStr) {
 	pcre2_code* re = pcre2_compile(
 		(PCRE2_SPTR)regexStr,
 		strlen(regexStr),
-		PCRE2_UTF,
+		PCRE2_UTF | PCRE2_MULTILINE,
 		&errorNumber,
 		&errorOffset,
 		NULL
@@ -131,7 +131,7 @@ int FindMatchPCRE(pcre2_code* re, const char* str, void (*callback)(long int sta
 		} else {
 			PCRE2_UCHAR buffer[120];
 			pcre2_get_error_message(rc, buffer, sizeof(buffer));
-			log_error("regex matching error %d: %s", rc, buffer);
+			log_error("regex matching error %d: %s in regex: %s", rc, buffer, str);
 		}
 	} else if (rc == 1) {
 		log_warn("No Matches Found!");
