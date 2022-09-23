@@ -12,9 +12,9 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Install Git, Scons & libtre
+    - name: Install Git & Scons
       run: |
-        sudo apt-get install git scons libtre-dev libtre5
+        sudo apt-get install git scons
 
     - name: Build
       run: make gen-assets release
@@ -36,19 +36,9 @@ jobs:
       with:
         submodules: recursive
 
-    - name: Install scons, libtre & autotools
+    - name: Install scons
       run: |
-        brew install scons tre autoconf automake libtool gettext
-
-    - name: Build and install libtre
-      run: |
-        cd ..
-        git clone https://github.com/laurikari/tre --recursive
-        cd tre
-        ./utils/autogen.sh
-        ./configure
-        make
-        sudo make install
+        brew install scons
 
     - name: Build
       run: make gen-assets release
