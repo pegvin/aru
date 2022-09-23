@@ -92,8 +92,6 @@ language_t* LoadLanguage(const char* jsonText) {
 				if (regex == NULL) continue;
 
 				pattern_t* p = LoadPattern(regex, type == NULL ? "default" : type);
-				if (p == NULL) continue;
-
 				L->patterns[i] = p;
 				L->totalPatterns++;
 			}
