@@ -123,7 +123,7 @@ int FindMatchPCRE(pcre2_code* re, const char* str, void (*callback)(long int sta
 	matchData = pcre2_match_data_create_from_pattern(re, NULL);
 	int totalFound = 0;
 
-	int rc = pcre2_match(re, (PCRE2_SPTR)str, strlen(str), 0, 0, matchData, NULL);
+	int rc = pcre2_match(re, (PCRE2_SPTR)str, strlen(str), 0, PCRE2_NO_JIT, matchData, NULL);
 	if (rc < 0) {
 #if IS_DEBUG
 		if (rc == PCRE2_ERROR_NOMATCH) {
