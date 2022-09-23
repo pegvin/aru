@@ -24,13 +24,14 @@ a text editor
 - [x] Simple Text Editing
 - [x] Syntax Highlighting
 - [x] Opening, Closing & Saving Files
-- [ ] Windows Support (Unsure)
-- [x] Try [pcre2](https://github.com/PCRE2Project/pcre2) for "advanced" regex
-- [ ] Undo-Redo
 - [x] Custom Themes and Syntaxes
 - [x] Opening a file in editor itself
-- [ ] Loading Themes and syntaxes from disk
 - [x] Regex support for syntaxes
+- [x] Try [pcre2](https://github.com/PCRE2Project/pcre2) for "advanced" regex
+- [ ] Fix PCRE2 Different Behavior Depending On Release/Debug Mode
+- [ ] Undo-Redo
+- [ ] Loading Themes and syntaxes from disk
+- [ ] Windows Support (Unsure)
 
 ---
 ### Screenshots
