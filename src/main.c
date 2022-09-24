@@ -31,6 +31,8 @@
 #define _BSD_SOURCE
 #define _GNU_SOURCE
 
+#include <libgen.h>
+
 #include "main.h"
 #include "abuf.h"
 #include "colors.h"
