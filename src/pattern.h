@@ -33,6 +33,7 @@
 
 typedef struct {
     pcre2_code* re;
+    pcre2_match_data* md;
 	syntax_color_t color;
 } pattern_t;
 
@@ -42,7 +43,7 @@ void FreePattern(pattern_t* p);
 // Compiles Regex String, Used By LoadPattern.
 pcre2_code* CompileRegexPCRE2(const char* regexStr);
 void FreeRegexPCRE2(pcre2_code* re);
-int FindMatchPCRE(pcre2_code* re, const char* str, void (*callback)(long int start, long int end, void* data), void* data);
+int FindMatchPCRE(pattern_t* p, const char* str, void (*callback)(long int start, long int end, void* data), void* data);
 
 
 #endif

@@ -40,8 +40,12 @@ pattern_t* LoadPattern(const char* regexStr, const char* _colorStr) {
 	pcre2_code* re = CompileRegexPCRE2(regexStr);
 	if (re == NULL) return NULL;
 
+	pcre2_match_data* md = NULL;
+	md = pcre2_match_data_create_from_pattern(re, NULL);
+
 	p = malloc(sizeof(pattern_t));
 	p->re = re;
+	p->md = md;
 	p->color = HL_NORMAL;
 
 	if (_colorStr != NULL) {
@@ -76,7 +80,12 @@ pattern_t* LoadPattern(const char* regexStr, const char* _colorStr) {
 
 void FreePattern(pattern_t* p) {
 	if (p != NULL) {
-		FreeRegexPCRE2(p->re);
+		if (p->re)
+			FreeRegexPCRE2(p->re);
+		if (p->md)
+			pcre2_match_data_free(p->md);
+
+		p->md = NULL;
 		p->re = NULL;
 		p->color = 0;
 		free(p);
@@ -116,14 +125,16 @@ void FreeRegexPCRE2(pcre2_code* re) {
 	}
 }
 
-int FindMatchPCRE(pcre2_code* re, const char* str, void (*callback)(long int start, long int end, void* data), void* data) {
-	if (re == NULL || str == NULL) return -1;
+int FindMatchPCRE(pattern_t* p, const char* str, void (*callback)(long int start, long int end, void* data), void* data) {
+	if (p == NULL || str == NULL) return -1;
 
 	pcre2_match_data* matchData = NULL;
-	matchData = pcre2_match_data_create_from_pattern(re, NULL);
-	int totalFound = 0;
+	if (p->md == NULL) {
+		matchData = pcre2_match_data_create_from_pattern(p->re, NULL);
+	}
 
-	int rc = pcre2_match(re, (PCRE2_SPTR)str, strlen(str), 0, PCRE2_NO_JIT, matchData, NULL);
+	int totalFound = 0;
+	int rc = pcre2_match(p->re, (PCRE2_SPTR)str, strlen(str), 0, PCRE2_NO_JIT, p->md == NULL ? matchData : p->md, NULL);
 	if (rc < 0) {
 #if IS_DEBUG
 		if (rc == PCRE2_ERROR_NOMATCH) {
@@ -137,7 +148,7 @@ int FindMatchPCRE(pcre2_code* re, const char* str, void (*callback)(long int sta
 		log_warn("No Matches Found!");
 #endif
 	} else {
-		PCRE2_SIZE* ovector = pcre2_get_ovector_pointer(matchData);
+		PCRE2_SIZE* ovector = pcre2_get_ovector_pointer(p->md == NULL ? matchData : p->md);
 		if (ovector[0] > ovector[1]) {
 #if IS_DEBUG
 			log_error("regex matching error: \\K was used in an assertion to set the match start after its end\n");

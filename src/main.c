@@ -180,7 +180,7 @@ void EditorSyntaxHighlightRow(erow *row) {
 				if (p == NULL) continue;
 
 				struct onMatchFoundData data = { p, row, i };
-				FindMatchPCRE(p->re, &row->render[i], onMatchFound, (void*)&data);
+				FindMatchPCRE(p, &row->render[i], onMatchFound, (void*)&data);
 			}
 
 			for (j = 0; j < E.syntax->totalKeywords1; j++) {
@@ -245,7 +245,7 @@ void EditorSelectSyntax() {
 		language_t* s = L_Arr->languages[j];
 
 		pattern_t* p = s->filePattern;
-		int result = FindMatchPCRE(p->re, E.filePath, NULL, NULL);;
+		int result = FindMatchPCRE(p, E.filePath, NULL, NULL);;
 		if (result > 0) {
 			E.syntax = s;
 
